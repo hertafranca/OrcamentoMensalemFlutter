@@ -32,12 +32,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Monthly Expense')),
+      appBar: AppBar(title: const Text('Mounthly Expense')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: _expenses.isEmpty
-              ? const Center(child: Text('No transaction registered.'))
+              ? const Center(child: Text('No transactions registered.'))
               : ListView.builder(
                   itemCount: _expenses.length,
                   itemBuilder: (context, index) {
