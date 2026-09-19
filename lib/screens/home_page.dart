@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../models/expense.dart';
 import '../models/expense_category.dart';
+import '../widgets/budget_summary_card.dart';
+import '../widgets/category_budget_card.dart';
 import '../widgets/expense_tile.dart';
 import 'add_expense_page.dart';
 import 'budget_goals_page.dart';
@@ -28,12 +30,10 @@ class _HomePageState extends State<HomePage> {
     return _goals.values.fold(0, (total, goal) => total + goal);
   }
 
-  double get _balance {
-    return _totalBudget - _totalSpent;
-  }
-
-  String _formatMoney(double value) {
-    return '€ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
+  double spentByCategory(ExpenseCategory category) {
+    return _expenses
+        .where((expense) => expense.category == category)
+        .fold(0, (total, expense) => total + expense.amount);
   }
 
   Future<void> _openAddExpense() async {
@@ -72,8 +72,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isOverBudget = _balance < 0;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mounthly Expense'),
@@ -81,7 +79,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             onPressed: _openBudgetGoals,
             icon: const Icon(Icons.tune),
-            tooltip: 'Set goals',
+            tooltip: 'Set Goals',
           ),
         ],
       ),
@@ -91,30 +89,18 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Summary of the month',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text('Budget: ${_formatMoney(_totalBudget)}'),
-                      const SizedBox(height: 8),
-                      Text('Expense: ${_formatMoney(_totalSpent)}'),
-                      const SizedBox(height: 8),
-                      if (isOverBudget)
-                        Text('Exceeded: ${_formatMoney(_balance.abs())}')
-                      else
-                        Text('Remaining: ${_formatMoney(_balance)}'),
-                    ],
-                  ),
+              BudgetSummaryCard(budget: _totalBudget, spent: _totalSpent),
+              const SizedBox(height: 24),
+              const Text(
+                'Goals by category',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              ...ExpenseCategory.values.map(
+                (category) => CategoryBudgetCard(
+                  category: category,
+                  goal: _goals[category] ?? 0,
+                  spent: spentByCategory(category),
                 ),
               ),
               const SizedBox(height: 24),
@@ -132,6 +118,7 @@ class _HomePageState extends State<HomePage> {
                 )
               else
                 ..._expenses.map((expense) => ExpenseTile(expense: expense)),
+              const SizedBox(height: 80),
             ],
           ),
         ),
