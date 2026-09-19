@@ -1,269 +1,151 @@
 # Projeto: Orçamento Mensal em Flutter
 
-Este guia foi pensado como um projeto **didático e incremental**, para que cada etapa possa ser implementada e validada antes de avançar.
+## Como usar este roteiro
 
-Para a primeira versão, evite `Provider`, `Riverpod`, BLoC, banco de dados e outras dependências. O objetivo é praticar os fundamentos do Flutter usando `setState()` e estado em memória.
+Este roteiro foi feito para alguém que está começando em Flutter e **não precisa saber completar código por conta própria**.
+
+A regra durante todo o exercício será:
+
+> Quando o roteiro disser **"crie este arquivo"** ou **"substitua o conteúdo deste arquivo"**, copie exatamente o código completo apresentado.
+
+Sempre que um arquivo precisar mudar, o roteiro mostrará **o arquivo inteiro novamente**. Assim, não é necessário descobrir sozinho onde colocar um método, um widget, um `import` ou uma variável.
+
+Outra regra importante:
+
+> **Não avance para a próxima etapa se o checkpoint atual não estiver funcionando.**
+
+A ideia é montar o aplicativo como um LEGO: uma peça por vez, mantendo o projeto funcionando antes de adicionar a próxima.
 
 ---
 
-## Objetivo do aplicativo
+# O aplicativo
 
 O aplicativo será um orçamento mensal onde o usuário poderá:
 
-- Definir uma meta de gastos para cada categoria;
-- Cadastrar um gasto;
-- Visualizar os gastos cadastrados;
-- Visualizar quanto já foi gasto;
-- Visualizar quanto ainda pode gastar;
-- Saber se ultrapassou o orçamento;
-- Saber quanto gastou por categoria.
+- cadastrar gastos;
+- visualizar o histórico de gastos;
+- definir uma meta de gasto para cada categoria;
+- visualizar quanto já gastou;
+- visualizar quanto ainda pode gastar;
+- saber se ultrapassou o orçamento;
+- visualizar o gasto de cada categoria.
 
-### Categorias
+## Categorias
 
-- Restauração
-- Transporte
-- Roupas
-- Educação
-- Lazer
+1. Restauração;
+2. Transporte;
+3. Roupas;
+4. Educação;
+5. Lazer.
 
-### Regras
+## Dados obrigatórios de um gasto
 
-Cada gasto deve possuir:
+Cada gasto precisa ter:
 
-- Título
-- Categoria
-- Valor
+- título;
+- categoria;
+- valor.
 
-Os lançamentos não precisam estar:
-
-- Ordenados
-- Filtrados
-
-A meta total do mês será a soma das metas de todas as categorias.
-
-Exemplo:
-
-```text
-Restauração: €300
-Transporte:  €150
-Roupas:      €100
-Educação:    €200
-Lazer:       €150
-------------------
-Orçamento:   €900
-```
+Os lançamentos **não precisam estar ordenados nem filtrados**.
 
 ---
 
-# Estrutura final do projeto
+# Estrutura final
 
-Ao terminar, o diretório `lib` deve ficar aproximadamente assim:
+Ao terminar, teremos esta estrutura dentro de `lib`:
 
 ```text
 lib/
-│
 ├── main.dart
-│
 ├── models/
 │   ├── expense.dart
 │   └── expense_category.dart
-│
 ├── screens/
 │   ├── home_page.dart
 │   ├── add_expense_page.dart
 │   └── budget_goals_page.dart
-│
 └── widgets/
+    ├── expense_tile.dart
     ├── budget_summary_card.dart
-    ├── category_budget_card.dart
-    └── expense_tile.dart
+    └── category_budget_card.dart
 ```
 
-Não precisa criar tudo de uma vez.
-
-A ideia é criar conforme avançamos.
+Não crie tudo agora. Vamos criar cada arquivo no momento correto.
 
 ---
 
 # Etapa 1 — Criar o projeto
 
-Criar o projeto:
+No terminal:
 
 ```bash
 flutter create monthly_budget
 ```
 
-Entrar na pasta:
+Entre na pasta:
 
 ```bash
 cd monthly_budget
 ```
 
-Executar:
+Execute:
 
 ```bash
 flutter run
 ```
 
-Nesse momento, não precisa alterar nada.
-
 ## Checkpoint
 
-Antes de continuar:
-
-- [ ] O projeto compila.
-- [ ] O aplicativo padrão do Flutter abre.
-- [ ] O contador padrão funciona.
-- [ ] Não existem erros no terminal.
-
-Se isso estiver funcionando, pode apagar o código padrão.
+- [ ] O projeto foi criado.
+- [ ] `flutter run` funciona.
+- [ ] O aplicativo padrão aparece.
+- [ ] Não existem erros vermelhos no terminal.
 
 ---
 
-# Etapa 2 — Criar as categorias
+# Etapa 2 — Criar a primeira tela
 
-Criar:
+Crie a pasta:
 
 ```text
-lib/models/expense_category.dart
+lib/screens
 ```
 
-A primeira tarefa é representar as cinco categorias.
+Crie o arquivo:
 
-Pode usar um `enum`:
+```text
+lib/screens/home_page.dart
+```
+
+Copie **todo** o código:
 
 ```dart
-enum ExpenseCategory {
-  restaurant('Restauração'),
-  transport('Transporte'),
-  clothes('Roupas'),
-  education('Educação'),
-  leisure('Lazer');
+import 'package:flutter/material.dart';
 
-  final String label;
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
-  const ExpenseCategory(this.label);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Orçamento Mensal'),
+      ),
+      body: const Center(
+        child: Text('Meu orçamento'),
+      ),
+    );
+  }
 }
 ```
 
-Isso permite escrever:
-
-```dart
-ExpenseCategory.restaurant
-```
-
-e obter:
-
-```dart
-ExpenseCategory.restaurant.label
-```
-
-que retorna:
-
-```text
-Restauração
-```
-
-## O que está sendo praticado
-
-- `enum`
-- propriedades
-- construtor
-- modelagem de domínio
-
-## Checkpoint
-
-Faça temporariamente:
-
-```dart
-print(ExpenseCategory.restaurant.label);
-```
-
-O console deve mostrar:
-
-```text
-Restauração
-```
-
----
-
-# Etapa 3 — Criar o modelo de um gasto
-
-Criar:
-
-```text
-lib/models/expense.dart
-```
-
-Cada gasto precisa ter exatamente os dados definidos nos requisitos:
-
-```dart
-import 'expense_category.dart';
-
-class Expense {
-  final String title;
-  final ExpenseCategory category;
-  final double amount;
-
-  const Expense({
-    required this.title,
-    required this.category,
-    required this.amount,
-  });
-}
-```
-
-Por enquanto não vamos adicionar:
-
-```text
-id
-data
-descrição
-mês
-usuário
-```
-
-porque não fazem parte do requisito.
-
-Ela precisa conseguir criar algo assim:
-
-```dart
-final expense = Expense(
-  title: 'Jantar',
-  category: ExpenseCategory.restaurant,
-  amount: 35.50,
-);
-```
-
-## Checkpoint
-
-Teste:
-
-```dart
-print(expense.title);
-print(expense.category.label);
-print(expense.amount);
-```
-
-Deve aparecer algo parecido com:
-
-```text
-Jantar
-Restauração
-35.5
-```
-
----
-
-# Etapa 4 — Preparar o `main.dart`
-
-Editar:
+Agora abra:
 
 ```text
 lib/main.dart
 ```
 
-Pode começar assim:
+Apague tudo e coloque:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -294,35 +176,600 @@ class BudgetApp extends StatelessWidget {
 }
 ```
 
-Ainda não existe `HomePage`, então naturalmente o projeto dará erro até a próxima etapa.
+## Checkpoint
+
+Na tela deve aparecer:
+
+```text
+Orçamento Mensal
+
+Meu orçamento
+```
+
+- [ ] A AppBar aparece.
+- [ ] O texto aparece.
+- [ ] O app continua compilando.
 
 ---
 
-# Etapa 5 — Criar a tela principal
+# Etapa 3 — Criar as categorias
 
-Criar:
+Crie a pasta:
 
 ```text
-lib/screens/home_page.dart
+lib/models
 ```
 
-Essa será a tela mais importante do aplicativo.
+Crie:
 
-Ela precisa ser um:
+```text
+lib/models/expense_category.dart
+```
+
+Copie o arquivo completo:
 
 ```dart
-StatefulWidget
+enum ExpenseCategory {
+  restaurant('Restauração'),
+  transport('Transporte'),
+  clothes('Roupas'),
+  education('Educação'),
+  leisure('Lazer');
+
+  final String label;
+
+  const ExpenseCategory(this.label);
+}
 ```
 
-porque os gastos vão mudar enquanto o aplicativo estiver sendo utilizado.
+## Checkpoint
 
-Comece com:
+- [ ] O arquivo existe.
+- [ ] Não existem erros vermelhos.
+- [ ] O app continua funcionando.
+
+---
+
+# Etapa 4 — Criar o modelo de gasto
+
+Crie:
+
+```text
+lib/models/expense.dart
+```
+
+Copie o arquivo completo:
+
+```dart
+import 'expense_category.dart';
+
+class Expense {
+  final String title;
+  final ExpenseCategory category;
+  final double amount;
+
+  const Expense({
+    required this.title,
+    required this.category,
+    required this.amount,
+  });
+}
+```
+
+Um gasto agora pode ser representado assim:
+
+```dart
+Expense(
+  title: 'Jantar',
+  category: ExpenseCategory.restaurant,
+  amount: 35.50,
+)
+```
+
+## Checkpoint
+
+- [ ] `expense.dart` existe.
+- [ ] `expense_category.dart` existe.
+- [ ] Não existem erros.
+
+---
+
+# Etapa 5 — Criar a tela completa de cadastro
+
+Crie:
+
+```text
+lib/screens/add_expense_page.dart
+```
+
+Copie **o arquivo inteiro**:
 
 ```dart
 import 'package:flutter/material.dart';
 
 import '../models/expense.dart';
 import '../models/expense_category.dart';
+
+class AddExpensePage extends StatefulWidget {
+  const AddExpensePage({super.key});
+
+  @override
+  State<AddExpensePage> createState() => _AddExpensePageState();
+}
+
+class _AddExpensePageState extends State<AddExpensePage> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _titleController = TextEditingController();
+  final _amountController = TextEditingController();
+
+  ExpenseCategory? _selectedCategory;
+
+  void _saveExpense() {
+    final isValid = _formKey.currentState!.validate();
+
+    if (!isValid) {
+      return;
+    }
+
+    final amount = double.parse(
+      _amountController.text.replaceAll(',', '.'),
+    );
+
+    final expense = Expense(
+      title: _titleController.text.trim(),
+      category: _selectedCategory!,
+      amount: amount,
+    );
+
+    Navigator.pop(context, expense);
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Novo gasto'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  controller: _titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Título',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Informe um título';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<ExpenseCategory>(
+                  initialValue: _selectedCategory,
+                  decoration: const InputDecoration(
+                    labelText: 'Categoria',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ExpenseCategory.values.map((category) {
+                    return DropdownMenuItem<ExpenseCategory>(
+                      value: category,
+                      child: Text(category.label),
+                    );
+                  }).toList(),
+                  onChanged: (category) {
+                    setState(() {
+                      _selectedCategory = category;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Selecione uma categoria';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _amountController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(
+                    labelText: 'Valor',
+                    prefixText: '€ ',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Informe o valor';
+                    }
+
+                    final amount = double.tryParse(
+                      value.replaceAll(',', '.'),
+                    );
+
+                    if (amount == null) {
+                      return 'Informe um valor válido';
+                    }
+
+                    if (amount <= 0) {
+                      return 'O valor deve ser maior que zero';
+                    }
+
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _saveExpense,
+                  child: const Text('Adicionar gasto'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+Nesta etapa a tela está completa, mas ainda não existe um botão para abri-la. Isso é normal.
+
+## Checkpoint
+
+- [ ] `add_expense_page.dart` existe.
+- [ ] O componente está completo, inclusive o método `build`.
+- [ ] Não existem erros vermelhos.
+- [ ] O projeto continua compilando.
+
+---
+
+# Etapa 6 — Criar o componente visual de um gasto
+
+Crie a pasta:
+
+```text
+lib/widgets
+```
+
+Crie:
+
+```text
+lib/widgets/expense_tile.dart
+```
+
+Copie o arquivo completo:
+
+```dart
+import 'package:flutter/material.dart';
+
+import '../models/expense.dart';
+
+class ExpenseTile extends StatelessWidget {
+  final Expense expense;
+
+  const ExpenseTile({
+    super.key,
+    required this.expense,
+  });
+
+  String _formatMoney(double value) {
+    return '€ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        title: Text(expense.title),
+        subtitle: Text(expense.category.label),
+        trailing: Text(
+          _formatMoney(expense.amount),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Checkpoint
+
+- [ ] `expense_tile.dart` existe.
+- [ ] Não existem erros.
+- [ ] O app continua compilando.
+
+---
+
+# Etapa 7 — Fazer a Home cadastrar e mostrar gastos
+
+Abra:
+
+```text
+lib/screens/home_page.dart
+```
+
+Apague **todo** o conteúdo atual e substitua por:
+
+```dart
+import 'package:flutter/material.dart';
+
+import '../models/expense.dart';
+import '../widgets/expense_tile.dart';
+import 'add_expense_page.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final List<Expense> _expenses = [];
+
+  Future<void> _openAddExpense() async {
+    final expense = await Navigator.push<Expense>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddExpensePage(),
+      ),
+    );
+
+    if (expense == null) {
+      return;
+    }
+
+    setState(() {
+      _expenses.add(expense);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Orçamento Mensal'),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: _expenses.isEmpty
+              ? const Center(
+                  child: Text('Nenhuma transação cadastrada.'),
+                )
+              : ListView.builder(
+                  itemCount: _expenses.length,
+                  itemBuilder: (context, index) {
+                    final expense = _expenses[index];
+
+                    return ExpenseTile(
+                      expense: expense,
+                    );
+                  },
+                ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddExpense,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+```
+
+## Teste
+
+Toque em `+` e cadastre:
+
+```text
+Título: Uber
+Categoria: Transporte
+Valor: 15
+```
+
+Ao tocar em `Adicionar gasto`, deve voltar para a Home e mostrar:
+
+```text
+Uber
+Transporte                         € 15,00
+```
+
+## Checkpoint
+
+- [ ] O botão `+` abre o cadastro.
+- [ ] O formulário aparece completo.
+- [ ] Título vazio mostra erro.
+- [ ] Categoria vazia mostra erro.
+- [ ] Valor inválido mostra erro.
+- [ ] Ao salvar, volta para a Home.
+- [ ] O gasto aparece na lista.
+- [ ] É possível cadastrar vários gastos.
+
+---
+
+# Etapa 8 — Criar a tela completa de metas
+
+Crie:
+
+```text
+lib/screens/budget_goals_page.dart
+```
+
+Copie o arquivo completo:
+
+```dart
+import 'package:flutter/material.dart';
+
+import '../models/expense_category.dart';
+
+class BudgetGoalsPage extends StatefulWidget {
+  final Map<ExpenseCategory, double> currentGoals;
+
+  const BudgetGoalsPage({
+    super.key,
+    required this.currentGoals,
+  });
+
+  @override
+  State<BudgetGoalsPage> createState() => _BudgetGoalsPageState();
+}
+
+class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
+  final _formKey = GlobalKey<FormState>();
+
+  late final Map<ExpenseCategory, TextEditingController> _controllers;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controllers = {
+      for (final category in ExpenseCategory.values)
+        category: TextEditingController(
+          text: (widget.currentGoals[category] ?? 0).toStringAsFixed(2),
+        ),
+    };
+  }
+
+  void _saveGoals() {
+    final isValid = _formKey.currentState!.validate();
+
+    if (!isValid) {
+      return;
+    }
+
+    final goals = <ExpenseCategory, double>{};
+
+    for (final category in ExpenseCategory.values) {
+      final text = _controllers[category]!.text.replaceAll(',', '.');
+      goals[category] = double.parse(text);
+    }
+
+    Navigator.pop(context, goals);
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Metas do mês'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Informe quanto pretende gastar em cada categoria.',
+                ),
+                const SizedBox(height: 24),
+                ...ExpenseCategory.values.map((category) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: TextFormField(
+                      controller: _controllers[category],
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: category.label,
+                        prefixText: '€ ',
+                        border: const OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Informe uma meta';
+                        }
+
+                        final goal = double.tryParse(
+                          value.replaceAll(',', '.'),
+                        );
+
+                        if (goal == null) {
+                          return 'Informe um valor válido';
+                        }
+
+                        if (goal < 0) {
+                          return 'A meta não pode ser negativa';
+                        }
+
+                        return null;
+                      },
+                    ),
+                  );
+                }),
+                ElevatedButton(
+                  onPressed: _saveGoals,
+                  child: const Text('Salvar metas'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+## Checkpoint
+
+- [ ] A tela está completa.
+- [ ] Existem os cinco campos no código.
+- [ ] Não existem erros.
+
+---
+
+# Etapa 9 — Adicionar metas e resumo à Home
+
+Abra:
+
+```text
+lib/screens/home_page.dart
+```
+
+Apague tudo e copie o arquivo completo:
+
+```dart
+import 'package:flutter/material.dart';
+
+import '../models/expense.dart';
+import '../models/expense_category.dart';
+import '../widgets/expense_tile.dart';
+import 'add_expense_page.dart';
+import 'budget_goals_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -339,1426 +786,906 @@ class _HomePageState extends State<HomePage> {
       category: 0.0,
   };
 
+  double get _totalSpent {
+    return _expenses.fold(
+      0,
+      (total, expense) => total + expense.amount,
+    );
+  }
+
+  double get _totalBudget {
+    return _goals.values.fold(
+      0,
+      (total, goal) => total + goal,
+    );
+  }
+
+  double get _balance {
+    return _totalBudget - _totalSpent;
+  }
+
+  String _formatMoney(double value) {
+    return '€ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
+  }
+
+  Future<void> _openAddExpense() async {
+    final expense = await Navigator.push<Expense>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddExpensePage(),
+      ),
+    );
+
+    if (expense == null) {
+      return;
+    }
+
+    setState(() {
+      _expenses.add(expense);
+    });
+  }
+
+  Future<void> _openBudgetGoals() async {
+    final goals = await Navigator.push<Map<ExpenseCategory, double>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BudgetGoalsPage(
+          currentGoals: Map.of(_goals),
+        ),
+      ),
+    );
+
+    if (goals == null) {
+      return;
+    }
+
+    setState(() {
+      _goals
+        ..clear()
+        ..addAll(goals);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isOverBudget = _balance < 0;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Orçamento Mensal'),
+        actions: [
+          IconButton(
+            onPressed: _openBudgetGoals,
+            icon: const Icon(Icons.tune),
+            tooltip: 'Definir metas',
+          ),
+        ],
       ),
-      body: const Center(
-        child: Text('Meu orçamento'),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Resumo do mês',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text('Orçamento: ${_formatMoney(_totalBudget)}'),
+                      const SizedBox(height: 8),
+                      Text('Gasto: ${_formatMoney(_totalSpent)}'),
+                      const SizedBox(height: 8),
+                      if (isOverBudget)
+                        Text(
+                          'Excedido: ${_formatMoney(_balance.abs())}',
+                        )
+                      else
+                        Text(
+                          'Restante: ${_formatMoney(_balance)}',
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Histórico de transações',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (_expenses.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text('Nenhuma transação cadastrada.'),
+                  ),
+                )
+              else
+                ..._expenses.map(
+                  (expense) => ExpenseTile(
+                    expense: expense,
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
-    );
-  }
-}
-```
-
-Temos agora duas informações importantes.
-
-`_expenses` guarda todos os gastos.
-
-`_goals` guarda a meta para cada categoria.
-
-Por exemplo:
-
-```dart
-_goals[ExpenseCategory.restaurant] = 300;
-```
-
-## Checkpoint
-
-Ao executar:
-
-```bash
-flutter run
-```
-
-deve aparecer:
-
-```text
-Orçamento Mensal
-
-Meu orçamento
-```
-
-Sem erros.
-
----
-
-# Etapa 6 — Criar a tela de cadastro de gasto
-
-Criar:
-
-```text
-lib/screens/add_expense_page.dart
-```
-
-A tela terá:
-
-```text
-Novo gasto
-
-Título
-[ Jantar com amigos ]
-
-Categoria
-[ Restauração      ▼ ]
-
-Valor
-[ 35,50 ]
-
-[ Adicionar gasto ]
-```
-
-## Widgets que devem ser usados
-
-```dart
-Scaffold
-AppBar
-Form
-TextFormField
-DropdownButtonFormField
-ElevatedButton
-Column
-Padding
-SizedBox
-```
-
-Comece com:
-
-```dart
-class AddExpensePage extends StatefulWidget {
-  const AddExpensePage({super.key});
-
-  @override
-  State<AddExpensePage> createState() => _AddExpensePageState();
-}
-```
-
-Dentro do estado:
-
-```dart
-final _formKey = GlobalKey<FormState>();
-
-final _titleController = TextEditingController();
-final _amountController = TextEditingController();
-
-ExpenseCategory? _selectedCategory;
-```
-
----
-
-# Etapa 7 — Campo de título
-
-Dentro do `Form`, criar:
-
-```dart
-TextFormField(
-  controller: _titleController,
-  decoration: const InputDecoration(
-    labelText: 'Título',
-    border: OutlineInputBorder(),
-  ),
-  validator: (value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Informe um título';
-    }
-
-    return null;
-  },
-),
-```
-
-## Testar duas situações
-
-Título vazio:
-
-```text
-Título vazio
-```
-
-deve dar erro.
-
-Título preenchido:
-
-```text
-Supermercado
-```
-
-deve ser aceito.
-
-## Checkpoint
-
-- [ ] Existe um campo de título.
-- [ ] O teclado aparece.
-- [ ] Não aceita título vazio.
-- [ ] A mensagem de erro aparece abaixo do campo.
-
----
-
-# Etapa 8 — Campo de categoria
-
-Adicionar um:
-
-```dart
-DropdownButtonFormField<ExpenseCategory>
-```
-
-Por exemplo:
-
-```dart
-DropdownButtonFormField<ExpenseCategory>(
-  initialValue: _selectedCategory,
-  decoration: const InputDecoration(
-    labelText: 'Categoria',
-    border: OutlineInputBorder(),
-  ),
-  items: ExpenseCategory.values.map((category) {
-    return DropdownMenuItem(
-      value: category,
-      child: Text(category.label),
-    );
-  }).toList(),
-  onChanged: (category) {
-    setState(() {
-      _selectedCategory = category;
-    });
-  },
-  validator: (value) {
-    if (value == null) {
-      return 'Selecione uma categoria';
-    }
-
-    return null;
-  },
-),
-```
-
-## Checkpoint
-
-O dropdown precisa mostrar exatamente:
-
-```text
-Restauração
-Transporte
-Roupas
-Educação
-Lazer
-```
-
-E não pode permitir salvar sem selecionar uma categoria.
-
----
-
-# Etapa 9 — Campo do valor
-
-Adicionar:
-
-```dart
-TextFormField(
-  controller: _amountController,
-  decoration: const InputDecoration(
-    labelText: 'Valor',
-    border: OutlineInputBorder(),
-    prefixText: '€ ',
-  ),
-  keyboardType: const TextInputType.numberWithOptions(
-    decimal: true,
-  ),
-  validator: (value) {
-    if (value == null || value.isEmpty) {
-      return 'Informe o valor';
-    }
-
-    final amount = double.tryParse(
-      value.replaceAll(',', '.'),
-    );
-
-    if (amount == null) {
-      return 'Informe um valor válido';
-    }
-
-    if (amount <= 0) {
-      return 'O valor deve ser maior que zero';
-    }
-
-    return null;
-  },
-),
-```
-
-O:
-
-```dart
-replaceAll(',', '.')
-```
-
-permite digitar tanto:
-
-```text
-20.50
-```
-
-quanto:
-
-```text
-20,50
-```
-
-## Checkpoint
-
-Deve funcionar:
-
-```text
-20
-20.50
-20,50
-150,99
-```
-
-Não deve aceitar:
-
-```text
-abc
--30
-0
-```
-
----
-
-# Etapa 10 — Salvar o gasto
-
-O botão deverá validar o formulário:
-
-```dart
-ElevatedButton(
-  onPressed: _saveExpense,
-  child: const Text('Adicionar gasto'),
-),
-```
-
-Criar:
-
-```dart
-void _saveExpense() {
-  if (!_formKey.currentState!.validate()) {
-    return;
-  }
-
-  final amount = double.parse(
-    _amountController.text.replaceAll(',', '.'),
-  );
-
-  final expense = Expense(
-    title: _titleController.text.trim(),
-    category: _selectedCategory!,
-    amount: amount,
-  );
-
-  Navigator.pop(context, expense);
-}
-```
-
-A tela de cadastro não adiciona diretamente na lista.
-
-Ela retorna um:
-
-```dart
-Expense
-```
-
-para a tela anterior.
-
-Não esquecer de liberar os controllers:
-
-```dart
-@override
-void dispose() {
-  _titleController.dispose();
-  _amountController.dispose();
-
-  super.dispose();
-}
-```
-
----
-
-# Etapa 11 — Abrir a tela pelo botão `+`
-
-Voltar para:
-
-```text
-home_page.dart
-```
-
-Adicionar:
-
-```dart
-floatingActionButton: FloatingActionButton(
-  onPressed: _openAddExpense,
-  child: const Icon(Icons.add),
-),
-```
-
-E criar:
-
-```dart
-Future<void> _openAddExpense() async {
-  final expense = await Navigator.push<Expense>(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const AddExpensePage(),
-    ),
-  );
-
-  if (expense == null) {
-    return;
-  }
-
-  setState(() {
-    _expenses.add(expense);
-  });
-}
-```
-
-Não esquecer:
-
-```dart
-import 'add_expense_page.dart';
-```
-
-## Checkpoint
-
-Faça este fluxo:
-
-```text
-Home
- ↓
-+
- ↓
-Novo gasto
- ↓
-Título: Uber
-Categoria: Transporte
-Valor: 15
- ↓
-Adicionar
- ↓
-Home
-```
-
-Depois disso:
-
-```dart
-_expenses.length
-```
-
-deve ser:
-
-```text
-1
-```
-
-Adicione outro.
-
-Deve ser:
-
-```text
-2
-```
-
----
-
-# Etapa 12 — Mostrar o histórico
-
-Criar:
-
-```text
-lib/widgets/expense_tile.dart
-```
-
-O objetivo é transformar um `Expense` em uma linha visual.
-
-Pode usar:
-
-```dart
-ListTile
-```
-
-Uma representação simples:
-
-```text
-🍴 Jantar
-   Restauração                €35,50
-```
-
-O widget receberá:
-
-```dart
-final Expense expense;
-```
-
-E pode utilizar:
-
-```dart
-ListTile(
-  title: Text(expense.title),
-  subtitle: Text(expense.category.label),
-  trailing: Text(
-    '€ ${expense.amount.toStringAsFixed(2)}',
-  ),
-)
-```
-
-Depois, na `HomePage`, mostrar:
-
-```dart
-if (_expenses.isEmpty)
-  const Text('Nenhuma transação cadastrada')
-else
-  ..._expenses.map(
-    (expense) => ExpenseTile(
-      expense: expense,
-    ),
-  ),
-```
-
-Não precisa ordenar.
-
-Isso atende ao requisito de que os lançamentos não precisam estar ordenados nem filtrados.
-
-## Checkpoint
-
-Adicione:
-
-```text
-Uber             Transporte   €12.00
-Pizza            Restauração  €24.00
-Cinema           Lazer        €10.00
-Curso Flutter    Educação     €50.00
-```
-
-Eles devem aparecer na Home.
-
----
-
-# Etapa 13 — Criar as metas por categoria
-
-Criar:
-
-```text
-lib/screens/budget_goals_page.dart
-```
-
-A tela pode ser:
-
-```text
-Metas do mês
-
-Restauração
-[ € 300 ]
-
-Transporte
-[ € 150 ]
-
-Roupas
-[ € 100 ]
-
-Educação
-[ € 200 ]
-
-Lazer
-[ € 150 ]
-
-[ Salvar metas ]
-```
-
-Essa página recebe:
-
-```dart
-final Map<ExpenseCategory, double> currentGoals;
-```
-
-Algo como:
-
-```dart
-class BudgetGoalsPage extends StatefulWidget {
-  final Map<ExpenseCategory, double> currentGoals;
-
-  const BudgetGoalsPage({
-    super.key,
-    required this.currentGoals,
-  });
-
-  @override
-  State<BudgetGoalsPage> createState() =>
-      _BudgetGoalsPageState();
-}
-```
-
----
-
-# Etapa 14 — Controllers para as metas
-
-Como temos cinco categorias, podemos criar um controller para cada uma:
-
-```dart
-late final Map<
-  ExpenseCategory,
-  TextEditingController
-> _controllers;
-```
-
-No `initState()`:
-
-```dart
-@override
-void initState() {
-  super.initState();
-
-  _controllers = {
-    for (final category in ExpenseCategory.values)
-      category: TextEditingController(
-        text: widget.currentGoals[category]
-                ?.toStringAsFixed(2) ??
-            '0.00',
-      ),
-  };
-}
-```
-
-No `dispose()`:
-
-```dart
-@override
-void dispose() {
-  for (final controller in _controllers.values) {
-    controller.dispose();
-  }
-
-  super.dispose();
-}
-```
-
----
-
-# Etapa 15 — Construir os campos dinamicamente
-
-Em vez de criar cinco `TextFormField` manualmente:
-
-```dart
-...ExpenseCategory.values.map(
-  (category) {
-    return TextFormField(
-      controller: _controllers[category],
-      decoration: InputDecoration(
-        labelText: category.label,
-        prefixText: '€ ',
-        border: const OutlineInputBorder(),
-      ),
-      keyboardType: const TextInputType.numberWithOptions(
-        decimal: true,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddExpense,
+        child: const Icon(Icons.add),
       ),
     );
-  },
-),
-```
-
-Aqui o objetivo é entender que os widgets podem ser criados a partir dos dados.
-
----
-
-# Etapa 16 — Retornar as metas
-
-Quando clicar em salvar, monte um novo mapa:
-
-```dart
-final goals = <ExpenseCategory, double>{};
-
-for (final category in ExpenseCategory.values) {
-  final text = _controllers[category]!
-      .text
-      .replaceAll(',', '.');
-
-  goals[category] = double.tryParse(text) ?? 0;
-}
-```
-
-Depois:
-
-```dart
-Navigator.pop(context, goals);
-```
-
----
-
-# Etapa 17 — Abrir as metas pela Home
-
-Na `AppBar` da Home:
-
-```dart
-actions: [
-  IconButton(
-    onPressed: _openBudgetGoals,
-    icon: const Icon(Icons.tune),
-  ),
-],
-```
-
-Criar:
-
-```dart
-Future<void> _openBudgetGoals() async {
-  final goals =
-      await Navigator.push<Map<ExpenseCategory, double>>(
-    context,
-    MaterialPageRoute(
-      builder: (_) => BudgetGoalsPage(
-        currentGoals: Map.of(_goals),
-      ),
-    ),
-  );
-
-  if (goals == null) {
-    return;
   }
-
-  setState(() {
-    _goals
-      ..clear()
-      ..addAll(goals);
-  });
 }
+```
+
+## Teste das metas
+
+Abra o botão de ajustes no canto superior direito e configure:
+
+```text
+Restauração: 300
+Transporte: 150
+Roupas: 100
+Educação: 200
+Lazer: 150
+```
+
+Toque em `Salvar metas`.
+
+O orçamento total deve mostrar:
+
+```text
+€ 900,00
 ```
 
 ## Checkpoint
 
-Configure:
-
-```text
-Restauração  €300
-Transporte   €150
-Roupas       €100
-Educação     €200
-Lazer        €150
-```
-
-Feche e abra novamente a tela de metas.
-
-Os valores precisam continuar aparecendo enquanto o app estiver aberto.
+- [ ] O botão de ajustes abre a tela de metas.
+- [ ] Existem cinco campos.
+- [ ] É possível salvar.
+- [ ] O total das metas aparece na Home.
+- [ ] Os gastos cadastrados continuam aparecendo.
 
 ---
 
-# Etapa 18 — Calcular quanto foi gasto
+# Etapa 10 — Criar o card de resumo
 
-Na `HomePage`:
-
-```dart
-double get _totalSpent {
-  return _expenses.fold(
-    0,
-    (total, expense) => total + expense.amount,
-  );
-}
-```
-
-Por exemplo:
-
-```text
-Pizza       €30
-Uber        €20
-Cinema      €15
-```
-
-Resultado:
-
-```text
-_totalSpent = €65
-```
-
-## Checkpoint
-
-Cadastre:
-
-```text
-€10
-€25
-€40
-```
-
-O resultado precisa ser:
-
-```text
-€75
-```
-
----
-
-# Etapa 19 — Calcular o orçamento disponível
-
-A meta total é:
-
-```dart
-double get _totalBudget {
-  return _goals.values.fold(
-    0,
-    (total, goal) => total + goal,
-  );
-}
-```
-
-Se as metas forem:
-
-```text
-300
-150
-100
-200
-150
-```
-
-deve retornar:
-
-```text
-900
-```
-
----
-
-# Etapa 20 — Calcular saldo
-
-Criar:
-
-```dart
-double get _balance {
-  return _totalBudget - _totalSpent;
-}
-```
-
-Exemplo:
-
-```text
-Orçamento: €900
-Gastos:    €650
-```
-
-Resultado:
-
-```text
-€250
-```
-
-Então mostrar:
-
-```text
-Você ainda pode gastar €250.
-```
-
-Outro exemplo:
-
-```text
-Orçamento: €900
-Gastos:    €1050
-```
-
-Resultado:
-
-```text
--€150
-```
-
-Então mostrar:
-
-```text
-Você ultrapassou o orçamento em €150.
-```
-
----
-
-# Etapa 21 — Criar o card resumo
-
-Criar:
+Crie:
 
 ```text
 lib/widgets/budget_summary_card.dart
 ```
 
-A ideia é chegar a algo parecido com:
-
-```text
-┌──────────────────────────────────┐
-│ Orçamento mensal                 │
-│                                  │
-│ €900,00                          │
-│                                  │
-│ Gasto             €650,00        │
-│ Restante           €250,00       │
-│                                  │
-│ ✓ Dentro do orçamento            │
-└──────────────────────────────────┘
-```
-
-Ou:
-
-```text
-┌──────────────────────────────────┐
-│ Orçamento mensal                 │
-│                                  │
-│ €900,00                          │
-│                                  │
-│ Gasto            €1050,00        │
-│ Excedido           €150,00       │
-│                                  │
-│ ⚠ Orçamento ultrapassado         │
-└──────────────────────────────────┘
-```
-
-Widgets sugeridos:
+Copie o arquivo completo:
 
 ```dart
-Card
-Padding
-Column
-Row
-Text
-Icon
-```
+import 'package:flutter/material.dart';
 
-O componente pode receber:
+class BudgetSummaryCard extends StatelessWidget {
+  final double budget;
+  final double spent;
 
-```dart
-final double budget;
-final double spent;
-```
+  const BudgetSummaryCard({
+    super.key,
+    required this.budget,
+    required this.spent,
+  });
 
-e calcular:
+  String _formatMoney(double value) {
+    return '€ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
+  }
 
-```dart
-final balance = budget - spent;
-```
+  @override
+  Widget build(BuildContext context) {
+    final balance = budget - spent;
+    final isOverBudget = balance < 0;
 
----
-
-# Etapa 22 — Gastos por categoria
-
-Criar esta função na Home:
-
-```dart
-double spentByCategory(
-  ExpenseCategory category,
-) {
-  return _expenses
-      .where(
-        (expense) => expense.category == category,
-      )
-      .fold(
-        0,
-        (total, expense) => total + expense.amount,
-      );
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Resumo do mês',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text('Orçamento: ${_formatMoney(budget)}'),
+            const SizedBox(height: 8),
+            Text('Gasto: ${_formatMoney(spent)}'),
+            const SizedBox(height: 8),
+            if (isOverBudget)
+              Text(
+                'Excedido: ${_formatMoney(balance.abs())}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              )
+            else
+              Text(
+                'Restante: ${_formatMoney(balance)}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            const SizedBox(height: 16),
+            if (budget == 0 && spent == 0)
+              const Text('Defina as metas do mês para começar.')
+            else if (isOverBudget)
+              const Text('Orçamento ultrapassado.')
+            else
+              const Text('Você está dentro do orçamento.'),
+          ],
+        ),
+      ),
+    );
+  }
 }
 ```
 
-Imagine:
+## Checkpoint
 
-```text
-Pizza        Restauração   €30
-Restaurante  Restauração   €50
-Uber         Transporte    €20
-Cinema       Lazer         €15
-```
-
-Então:
-
-```dart
-spentByCategory(
-  ExpenseCategory.restaurant,
-)
-```
-
-deve retornar:
-
-```text
-80
-```
+- [ ] O arquivo existe.
+- [ ] Não existem erros.
 
 ---
 
-# Etapa 23 — Criar card das categorias
+# Etapa 11 — Criar o card de categoria
 
-Criar:
+Crie:
 
 ```text
 lib/widgets/category_budget_card.dart
 ```
 
-Queremos chegar a:
-
-```text
-Restauração
-
-€180 de €300
-
-████████████░░░░░░░░ 60%
-```
-
-Ela vai praticar:
+Copie o arquivo completo:
 
 ```dart
-LinearProgressIndicator
-```
+import 'package:flutter/material.dart';
 
-Cálculo:
+import '../models/expense_category.dart';
 
-```dart
-final progress = goal > 0
-    ? spent / goal
-    : 0.0;
-```
+class CategoryBudgetCard extends StatelessWidget {
+  final ExpenseCategory category;
+  final double goal;
+  final double spent;
 
-Como o valor pode passar de `1`, faça:
+  const CategoryBudgetCard({
+    super.key,
+    required this.category,
+    required this.goal,
+    required this.spent,
+  });
 
-```dart
-final progress = goal > 0
-    ? (spent / goal).clamp(0.0, 1.0).toDouble()
-    : 0.0;
-```
+  String _formatMoney(double value) {
+    return '€ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
+  }
 
-E:
+  @override
+  Widget build(BuildContext context) {
+    final progress = goal > 0
+        ? (spent / goal).clamp(0.0, 1.0).toDouble()
+        : 0.0;
 
-```dart
-LinearProgressIndicator(
-  value: progress,
-),
-```
+    final difference = goal - spent;
+    final isOverGoal = difference < 0;
 
----
-
-# Etapa 24 — Exibir todas as categorias
-
-Na Home:
-
-```dart
-...ExpenseCategory.values.map(
-  (category) {
-    return CategoryBudgetCard(
-      category: category,
-      goal: _goals[category] ?? 0,
-      spent: spentByCategory(category),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              category.label,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '${_formatMoney(spent)} de ${_formatMoney(goal)}',
+            ),
+            const SizedBox(height: 12),
+            LinearProgressIndicator(
+              value: progress,
+            ),
+            const SizedBox(height: 8),
+            if (goal == 0)
+              const Text('Meta não definida.')
+            else if (isOverGoal)
+              Text(
+                'Meta excedida em ${_formatMoney(difference.abs())}.',
+              )
+            else
+              Text(
+                'Ainda pode gastar ${_formatMoney(difference)}.',
+              ),
+          ],
+        ),
+      ),
     );
-  },
-),
+  }
+}
 ```
 
-Resultado:
+## Checkpoint
 
-```text
-Restauração
-€250 / €300
-████████████████░░
-
-Transporte
-€70 / €150
-████████░░░░░░░░░░
-
-Roupas
-€100 / €100
-██████████████████
-
-Educação
-€250 / €200
-██████████████████
-
-Lazer
-€40 / €150
-████░░░░░░░░░░░░░░
-```
+- [ ] O arquivo existe.
+- [ ] Não existem erros.
 
 ---
 
-# Etapa 25 — Organização final da Home
+# Etapa 12 — Montar a Home final
 
-A tela pode seguir esta ordem:
+Abra:
 
 ```text
-ORÇAMENTO MENSAL
-────────────────────────
-
-Orçamento
-€900
-
-Gasto
-€650
-
-Restante
-€250
-
-✓ Dentro do orçamento
-
-
-METAS POR CATEGORIA
-
-Restauração
-€200 / €300
-████████████░░░░
-
-Transporte
-€100 / €150
-██████████░░░░░░
-
-...
-
-
-HISTÓRICO
-
-Pizza
-Restauração                   €30
-
-Uber
-Transporte                    €20
-
-Cinema
-Lazer                         €15
-
-
-                         [ + ]
+lib/screens/home_page.dart
 ```
 
-Não precisa tentar deixar bonito antes de tudo funcionar.
+Apague tudo e copie **o arquivo completo**:
 
-Regra recomendada:
+```dart
+import 'package:flutter/material.dart';
 
-> **Primeiro funcional. Depois visual.**
+import '../models/expense.dart';
+import '../models/expense_category.dart';
+import '../widgets/budget_summary_card.dart';
+import '../widgets/category_budget_card.dart';
+import '../widgets/expense_tile.dart';
+import 'add_expense_page.dart';
+import 'budget_goals_page.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final List<Expense> _expenses = [];
+
+  final Map<ExpenseCategory, double> _goals = {
+    for (final category in ExpenseCategory.values)
+      category: 0.0,
+  };
+
+  double get _totalSpent {
+    return _expenses.fold(
+      0,
+      (total, expense) => total + expense.amount,
+    );
+  }
+
+  double get _totalBudget {
+    return _goals.values.fold(
+      0,
+      (total, goal) => total + goal,
+    );
+  }
+
+  double spentByCategory(ExpenseCategory category) {
+    return _expenses
+        .where(
+          (expense) => expense.category == category,
+        )
+        .fold(
+          0,
+          (total, expense) => total + expense.amount,
+        );
+  }
+
+  Future<void> _openAddExpense() async {
+    final expense = await Navigator.push<Expense>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddExpensePage(),
+      ),
+    );
+
+    if (expense == null) {
+      return;
+    }
+
+    setState(() {
+      _expenses.add(expense);
+    });
+  }
+
+  Future<void> _openBudgetGoals() async {
+    final goals = await Navigator.push<Map<ExpenseCategory, double>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BudgetGoalsPage(
+          currentGoals: Map.of(_goals),
+        ),
+      ),
+    );
+
+    if (goals == null) {
+      return;
+    }
+
+    setState(() {
+      _goals
+        ..clear()
+        ..addAll(goals);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Orçamento Mensal'),
+        actions: [
+          IconButton(
+            onPressed: _openBudgetGoals,
+            icon: const Icon(Icons.tune),
+            tooltip: 'Definir metas',
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              BudgetSummaryCard(
+                budget: _totalBudget,
+                spent: _totalSpent,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Metas por categoria',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...ExpenseCategory.values.map(
+                (category) => CategoryBudgetCard(
+                  category: category,
+                  goal: _goals[category] ?? 0,
+                  spent: spentByCategory(category),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Histórico de transações',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (_expenses.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text('Nenhuma transação cadastrada.'),
+                  ),
+                )
+              else
+                ..._expenses.map(
+                  (expense) => ExpenseTile(
+                    expense: expense,
+                  ),
+                ),
+              const SizedBox(height: 80),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddExpense,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+```
+
+Agora todas as peças criadas anteriormente foram ligadas.
+
+## Checkpoint
+
+- [ ] A Home abre sem erros.
+- [ ] O resumo aparece.
+- [ ] As cinco categorias aparecem.
+- [ ] Cada categoria possui uma barra de progresso.
+- [ ] O histórico aparece.
+- [ ] O botão `+` continua funcionando.
+- [ ] O botão de metas continua funcionando.
 
 ---
 
-# Etapa 26 — Cenário completo de teste
+# Etapa 13 — Teste completo
 
-## 1. Configure metas
+## 1. Configure as metas
 
 ```text
-Restauração   €300
-Transporte    €150
-Roupas        €100
-Educação      €200
-Lazer         €150
+Restauração: €300
+Transporte: €150
+Roupas: €100
+Educação: €200
+Lazer: €150
 ```
 
 Total esperado:
 
 ```text
-€900
+€ 900,00
 ```
 
-## 2. Cadastre
+## 2. Cadastre Pizza
 
 ```text
-Pizza
-Restauração
-€40
+Título: Pizza
+Categoria: Restauração
+Valor: 40
 ```
 
-Depois:
+## 3. Cadastre Uber
 
 ```text
-Uber
-Transporte
-€20
+Título: Uber
+Categoria: Transporte
+Valor: 20
 ```
 
-Depois:
+## 4. Cadastre Cinema
 
 ```text
-Cinema
-Lazer
-€30
+Título: Cinema
+Categoria: Lazer
+Valor: 30
 ```
 
-Total gasto:
+## Resultado esperado
 
 ```text
-€90
+Orçamento: € 900,00
+Gasto:     € 90,00
+Restante:  € 810,00
 ```
 
-Saldo esperado:
-
-```text
-€810
-```
-
-## 3. Confira categorias
-
-Esperado:
+Categorias:
 
 ```text
 Restauração
-€40 / €300
+€ 40,00 de € 300,00
 
 Transporte
-€20 / €150
+€ 20,00 de € 150,00
 
 Roupas
-€0 / €100
+€ 0,00 de € 100,00
 
 Educação
-€0 / €200
+€ 0,00 de € 200,00
 
 Lazer
-€30 / €150
+€ 30,00 de € 150,00
 ```
 
 ## Checkpoint
 
-Se todos esses valores aparecerem corretamente, praticamente todas as regras da aplicação estão funcionando.
+- [ ] Orçamento = `€ 900,00`.
+- [ ] Gasto = `€ 90,00`.
+- [ ] Restante = `€ 810,00`.
+- [ ] Pizza aparece no histórico.
+- [ ] Uber aparece no histórico.
+- [ ] Cinema aparece no histórico.
+- [ ] Os valores por categoria estão corretos.
 
 ---
 
-# Etapa 27 — Teste de orçamento ultrapassado
+# Etapa 14 — Testar orçamento ultrapassado
 
-Agora cadastre:
+Adicione:
 
 ```text
-MacBook
-Educação
-€1000
+Título: Curso
+Categoria: Educação
+Valor: 1000
 ```
 
-Total gasto:
+Agora:
 
 ```text
-€1090
+Total gasto: € 1090,00
+Orçamento:   € 900,00
 ```
 
-Orçamento:
+O resumo deve mostrar:
 
 ```text
-€900
+Excedido: € 190,00
+Orçamento ultrapassado.
 ```
 
-O aplicativo precisa mostrar:
+Educação deve mostrar:
 
 ```text
-Orçamento ultrapassado
-
-€190 acima do orçamento
+€ 1000,00 de € 200,00
+Meta excedida em € 800,00.
 ```
 
 ## Checkpoint
 
-Não deve mostrar:
-
-```text
-Restante: -€190
-```
-
-Apesar de matematicamente correto, isso é pior para o usuário.
-
-Prefira:
-
-```dart
-if (_balance >= 0) {
-  // restante
-} else {
-  // excedido
-}
-```
-
-E mostrar:
-
-```dart
-_balance.abs()
-```
-
-quando ultrapassado.
+- [ ] Não aparece `Restante: -€ 190,00`.
+- [ ] Aparece `Excedido: € 190,00`.
+- [ ] Educação informa que a meta foi excedida.
 
 ---
 
-# Etapa 28 — Casos que precisam ser testados
+# Etapa 15 — Testes de formulário
 
-| Situação | Resultado esperado |
+Cadastro de gasto:
+
+| Teste | Resultado esperado |
 |---|---|
-| Título vazio | Mostrar erro |
-| Categoria vazia | Mostrar erro |
-| Valor vazio | Mostrar erro |
-| Valor `abc` | Mostrar erro |
-| Valor `0` | Mostrar erro |
-| Valor negativo | Mostrar erro |
+| Título vazio | Mostrar `Informe um título` |
+| Categoria vazia | Mostrar `Selecione uma categoria` |
+| Valor vazio | Mostrar `Informe o valor` |
+| Valor `abc` | Mostrar `Informe um valor válido` |
+| Valor `0` | Mostrar `O valor deve ser maior que zero` |
+| Valor `-10` | Mostrar erro |
 | Valor `12,50` | Aceitar |
 | Valor `12.50` | Aceitar |
-| Apertar voltar no cadastro | Não cadastrar |
-| Cadastrar dois gastos iguais | Aceitar |
-| Não existir nenhum gasto | Mostrar empty state |
-| Meta = €0 | Não quebrar progress bar |
-| Gasto maior que a meta | Mostrar que ultrapassou |
+| Voltar sem salvar | Não criar gasto |
+| Criar dois gastos iguais | Aceitar |
+
+Metas:
+
+| Teste | Resultado esperado |
+|---|---|
+| Meta vazia | Mostrar erro |
+| Meta `abc` | Mostrar erro |
+| Meta negativa | Mostrar erro |
+| Meta `0` | Aceitar |
+| Meta `100,50` | Aceitar |
+| Meta `100.50` | Aceitar |
 
 ---
 
-# O que NÃO colocar nessa primeira versão
+# Resultado visual esperado
 
-Evite deliberadamente:
+A tela principal ficará aproximadamente assim:
 
 ```text
-❌ Riverpod
-❌ Provider
-❌ BLoC
-❌ GetX
-❌ Clean Architecture
-❌ Repository
-❌ UseCases
-❌ Dependency Injection
-❌ API
-❌ Firebase
-❌ SQLite
-❌ Login
+ORÇAMENTO MENSAL                         ⚙
+
+┌──────────────────────────────────────┐
+│ Resumo do mês                        │
+│ Orçamento: € 900,00                  │
+│ Gasto:     € 90,00                   │
+│ Restante:  € 810,00                  │
+│ Você está dentro do orçamento.       │
+└──────────────────────────────────────┘
+
+METAS POR CATEGORIA
+
+┌──────────────────────────────────────┐
+│ Restauração                          │
+│ € 40,00 de € 300,00                  │
+│ ███░░░░░░░░░░░░░░░                  │
+│ Ainda pode gastar € 260,00.          │
+└──────────────────────────────────────┘
+
+...
+
+HISTÓRICO DE TRANSAÇÕES
+
+┌──────────────────────────────────────┐
+│ Pizza                     € 40,00    │
+│ Restauração                          │
+└──────────────────────────────────────┘
+
+┌──────────────────────────────────────┐
+│ Uber                      € 20,00    │
+│ Transporte                           │
+└──────────────────────────────────────┘
+
+                                   [ + ]
 ```
 
-Não porque essas ferramentas sejam ruins, mas porque elas não ajudam a aprender o objetivo desta primeira versão.
+---
 
-Esse projeto já ensina:
+# O que NÃO adicionar nesta primeira versão
+
+Não adicione:
+
+- Provider;
+- Riverpod;
+- BLoC;
+- GetX;
+- Clean Architecture;
+- Repository;
+- Use Cases;
+- Dependency Injection;
+- Firebase;
+- SQLite;
+- API;
+- Login.
+
+Nesta primeira versão queremos praticar apenas:
 
 ```text
 Model
- ↓
+  ↓
+Widget
+  ↓
 State
- ↓
-UI
- ↓
+  ↓
 Form
- ↓
-Validation
- ↓
-Navigation
- ↓
-Return value
- ↓
-setState
- ↓
-List rendering
- ↓
-Business rules
- ↓
-Componentização
+  ↓
+Validação
+  ↓
+Navigator
+  ↓
+Lista
+  ↓
+Cálculos
+  ↓
+Interface
 ```
 
 ---
 
-# Histórico não persistente
+# Importante — Os dados ainda não são salvos
 
-Com esta implementação:
+Os gastos estão armazenados em memória:
 
 ```dart
 final List<Expense> _expenses = [];
 ```
 
-o histórico existe **enquanto o aplicativo estiver executando**.
+As metas também:
 
-Se fechar o aplicativo completamente:
-
-```text
-expenses = []
+```dart
+final Map<ExpenseCategory, double> _goals = {
+  for (final category in ExpenseCategory.values)
+    category: 0.0,
+};
 ```
 
-novamente.
+Se fechar completamente o aplicativo e abrir novamente, os dados serão perdidos.
 
 Isso é proposital nesta primeira versão.
 
-Depois de terminar o projeto funcionando, uma segunda fase natural seria:
+---
+
+# Próxima fase possível
+
+Depois que esta versão estiver funcionando:
 
 ```text
-Fase 1
-UI + lógica + estado em memória
-        ↓
-Fase 2
-Persistência local
-        ↓
-Fase 3
-Histórico de vários meses
+FASE 1 — atual
+Interface + formulários + estado em memória
+
+                ↓
+
+FASE 2
+Salvar gastos e metas localmente
+
+                ↓
+
+FASE 3
+Adicionar data aos gastos
+
+                ↓
+
+FASE 4
+Criar histórico por mês
 ```
 
-Na Fase 2 ela poderia aprender armazenamento local sem misturar esse assunto com formulários e estado logo no início.
+---
+
+# Checklist final
+
+## Projeto
+
+- [ ] O projeto abre sem erros.
+- [ ] A Home aparece.
+- [ ] Não existem erros vermelhos.
+
+## Gastos
+
+- [ ] É possível abrir o cadastro.
+- [ ] É possível preencher título.
+- [ ] É possível escolher categoria.
+- [ ] É possível informar valor.
+- [ ] As validações funcionam.
+- [ ] É possível salvar.
+- [ ] O gasto aparece na Home.
+
+## Histórico
+
+- [ ] Todos os gastos aparecem.
+- [ ] O título aparece.
+- [ ] A categoria aparece.
+- [ ] O valor aparece.
+
+## Metas
+
+- [ ] Restauração possui meta.
+- [ ] Transporte possui meta.
+- [ ] Roupas possui meta.
+- [ ] Educação possui meta.
+- [ ] Lazer possui meta.
+- [ ] Todas podem ser alteradas.
+
+## Resumo
+
+- [ ] O orçamento total é calculado.
+- [ ] O total gasto é calculado.
+- [ ] O restante é calculado.
+- [ ] O excedente é calculado.
+- [ ] O app informa quando o orçamento foi ultrapassado.
+
+## Categorias
+
+- [ ] Cada categoria mostra sua meta.
+- [ ] Cada categoria mostra quanto foi gasto.
+- [ ] Cada categoria possui barra de progresso.
+- [ ] O app mostra quanto ainda pode gastar.
+- [ ] O app informa quando a meta foi ultrapassada.
 
 ---
 
-# Checklist final de implementação
+# O que foi aprendido
 
-## Parte 1 — Modelagem
+Ao terminar o projeto, terão sido usados:
 
-- [ ] Criar projeto.
-- [ ] Criar `ExpenseCategory`.
-- [ ] Criar `Expense`.
-- [ ] Criar `HomePage`.
+- `MaterialApp`;
+- `Scaffold`;
+- `AppBar`;
+- `StatelessWidget`;
+- `StatefulWidget`;
+- `setState`;
+- `enum`;
+- classes/modelos;
+- `List`;
+- `Map`;
+- `Form`;
+- `TextFormField`;
+- `DropdownButtonFormField`;
+- `TextEditingController`;
+- validação;
+- `ElevatedButton`;
+- `FloatingActionButton`;
+- `Navigator.push`;
+- `Navigator.pop`;
+- `ListTile`;
+- `Card`;
+- `Column`;
+- `Padding`;
+- `SizedBox`;
+- `SingleChildScrollView`;
+- `LinearProgressIndicator`;
+- criação e reutilização de widgets;
+- cálculos a partir de listas;
+- organização de arquivos.
 
-## Parte 2 — Cadastro
-
-- [ ] Criar `AddExpensePage`.
-- [ ] Criar campo título.
-- [ ] Criar dropdown de categoria.
-- [ ] Criar campo valor.
-- [ ] Validar formulário.
-- [ ] Criar `Expense`.
-- [ ] Retornar `Expense` com `Navigator.pop`.
-- [ ] Receber resultado na Home.
-- [ ] Adicionar na lista usando `setState`.
-
-## Parte 3 — Histórico
-
-- [ ] Criar `ExpenseTile`.
-- [ ] Mostrar lista de gastos.
-- [ ] Criar mensagem quando a lista estiver vazia.
-
-## Parte 4 — Orçamento
-
-- [ ] Criar `BudgetGoalsPage`.
-- [ ] Criar uma meta para cada categoria.
-- [ ] Salvar metas.
-- [ ] Calcular meta total.
-- [ ] Calcular gasto total.
-- [ ] Calcular saldo.
-- [ ] Identificar orçamento ultrapassado.
-
-## Parte 5 — Dashboard
-
-- [ ] Criar `BudgetSummaryCard`.
-- [ ] Mostrar orçamento.
-- [ ] Mostrar total gasto.
-- [ ] Mostrar restante ou excedente.
-- [ ] Calcular gastos por categoria.
-- [ ] Criar `CategoryBudgetCard`.
-- [ ] Adicionar `LinearProgressIndicator`.
-
-## Parte 6 — Finalização
-
-- [ ] Testar formulário inválido.
-- [ ] Testar orçamento zerado.
-- [ ] Testar orçamento ultrapassado.
-- [ ] Testar várias transações.
-- [ ] Melhorar espaçamento.
-- [ ] Melhorar cores.
-- [ ] Remover códigos de teste e `print()`.
-
----
-
-# Objetivo pedagógico
-
-Ao terminar este projeto, ela terá praticado:
-
-- `StatelessWidget`
-- `StatefulWidget`
-- `setState`
-- Models
-- Enums
-- `Form`
-- `TextFormField`
-- Validação
-- `TextEditingController`
-- Dropdowns
-- `ListTile`
-- Listas dinâmicas
-- `Navigator`
-- Retorno de valores entre páginas
-- Composição de widgets
-- Regras de negócio
-- Componentização
-
-A persistência fica propositalmente fora dessa primeira entrega.
-
-Depois que essa versão estiver pronta, o próximo exercício natural é fazer os gastos e metas sobreviverem ao fechamento do app e, em seguida, adicionar mês/data para transformar o histórico atual em um histórico mensal real.
+O ponto principal deste roteiro é que **nenhuma etapa exige completar um componente por conta própria**. Cada arquivo necessário aparece completo no momento em que deve ser criado ou substituído.
