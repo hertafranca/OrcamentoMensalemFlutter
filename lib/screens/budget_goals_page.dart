@@ -96,7 +96,7 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
                         }
 
                         if (goal < 0) {
-                          return 'A meta não pode ser negativa';
+                          return 'The goal cannot be negative.';
                         }
 
                         return null;
