@@ -76,12 +76,12 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Orçamento Mensal'),
+        title: const Text('Mounthly Expense'),
         actions: [
           IconButton(
             onPressed: _openBudgetGoals,
             icon: const Icon(Icons.tune),
-            tooltip: 'Definir metas',
+            tooltip: 'Set goals',
           ),
         ],
       ),
@@ -98,28 +98,28 @@ class _HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Resumo do mês',
+                        'Summary of the month',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Text('Orçamento: ${_formatMoney(_totalBudget)}'),
+                      Text('Budget: ${_formatMoney(_totalBudget)}'),
                       const SizedBox(height: 8),
-                      Text('Gasto: ${_formatMoney(_totalSpent)}'),
+                      Text('Expense: ${_formatMoney(_totalSpent)}'),
                       const SizedBox(height: 8),
                       if (isOverBudget)
-                        Text('Excedido: ${_formatMoney(_balance.abs())}')
+                        Text('Exceeded: ${_formatMoney(_balance.abs())}')
                       else
-                        Text('Restante: ${_formatMoney(_balance)}'),
+                        Text('Remaining: ${_formatMoney(_balance)}'),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 24),
               const Text(
-                'Histórico de transações',
+                'Transaction history',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                 const Card(
                   child: Padding(
                     padding: EdgeInsets.all(16),
-                    child: Text('Nenhuma transação cadastrada.'),
+                    child: Text('No transactions registered.'),
                   ),
                 )
               else
