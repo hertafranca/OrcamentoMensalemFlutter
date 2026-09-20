@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/expense.dart';
 import '../models/expense_category.dart';
+import '../services/local_storage_service.dart';
 import '../widgets/budget_summary_card.dart';
 import '../widgets/category_budget_card.dart';
 import '../widgets/expense_tile.dart';
@@ -16,11 +17,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final LocalStorageService _storage = LocalStorageService();
+
   final List<Expense> _expenses = [];
 
   final Map<ExpenseCategory, double> _goals = {
     for (final category in ExpenseCategory.values) category: 0.0,
   };
+
+  bool _isLoading = true;
 
   double get _totalSpent {
     return _expenses.fold(0, (total, expense) => total + expense.amount);
@@ -36,19 +41,49 @@ class _HomePageState extends State<HomePage> {
         .fold(0, (total, expense) => total + expense.amount);
   }
 
+  @override
+  void initState() {
+    super.initState();
+
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final expenses = await _storage.loadExpenses();
+    final goals = await _storage.loadGoals();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _expenses
+        ..clear()
+        ..addAll(expenses);
+
+      _goals
+        ..clear()
+        ..addAll(goals);
+
+      _isLoading = false;
+    });
+  }
+
   Future<void> _openAddExpense() async {
     final expense = await Navigator.push<Expense>(
       context,
       MaterialPageRoute(builder: (context) => const AddExpensePage()),
     );
 
-    if (expense == null) {
+    if (expense == null || !mounted) {
       return;
     }
 
     setState(() {
       _expenses.add(expense);
     });
+
+    await _storage.saveExpenses(_expenses);
   }
 
   Future<void> _openBudgetGoals() async {
@@ -59,7 +94,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    if (goals == null) {
+    if (goals == null || !mounted) {
       return;
     }
 
@@ -68,65 +103,79 @@ class _HomePageState extends State<HomePage> {
         ..clear()
         ..addAll(goals);
     });
+
+    await _storage.saveGoals(_goals);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mounthly Expense'),
+        title: const Text('Mounthly Budget'),
         actions: [
           IconButton(
-            onPressed: _openBudgetGoals,
+            onPressed: _isLoading ? null : _openBudgetGoals,
             icon: const Icon(Icons.tune),
-            tooltip: 'Set Goals',
+            tooltip: 'Define Goals',
           ),
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              BudgetSummaryCard(budget: _totalBudget, spent: _totalSpent),
-              const SizedBox(height: 24),
-              const Text(
-                'Goals by category',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              ...ExpenseCategory.values.map(
-                (category) => CategoryBudgetCard(
-                  category: category,
-                  goal: _goals[category] ?? 0,
-                  spent: spentByCategory(category),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    BudgetSummaryCard(budget: _totalBudget, spent: _totalSpent),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Goals by category',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...ExpenseCategory.values.map(
+                      (category) => CategoryBudgetCard(
+                        category: category,
+                        goal: _goals[category] ?? 0,
+                        spent: spentByCategory(category),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Transaction History',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    if (_expenses.isEmpty)
+                      const Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Text('No transactions registered'),
+                        ),
+                      )
+                    else
+                      ..._expenses.map(
+                        (expense) => ExpenseTile(expense: expense),
+                      ),
+                    const SizedBox(height: 80),
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
-              const Text(
-                'Transaction history',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              if (_expenses.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text('No transactions registered.'),
-                  ),
-                )
-              else
-                ..._expenses.map((expense) => ExpenseTile(expense: expense)),
-              const SizedBox(height: 80),
-            ],
-          ),
-        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openAddExpense,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: _isLoading
+          ? null
+          : FloatingActionButton(
+              onPressed: _openAddExpense,
+              child: const Icon(Icons.add),
+            ),
     );
   }
 }
