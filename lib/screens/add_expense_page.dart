@@ -4,7 +4,9 @@ import '../models/expense.dart';
 import '../models/expense_category.dart';
 
 class AddExpensePage extends StatefulWidget {
-  const AddExpensePage({super.key});
+  final Expense? expenseToEdit;
+
+  const AddExpensePage({super.key, this.expenseToEdit});
 
   @override
   State<AddExpensePage> createState() => _AddExpensePageState();
@@ -13,10 +15,29 @@ class AddExpensePage extends StatefulWidget {
 class _AddExpensePageState extends State<AddExpensePage> {
   final _formKey = GlobalKey<FormState>();
 
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _amountController;
 
   ExpenseCategory? _selectedCategory;
+
+  bool get _isEditing {
+    return widget.expenseToEdit != null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final expense = widget.expenseToEdit;
+
+    _titleController = TextEditingController(text: expense?.title ?? '');
+
+    _amountController = TextEditingController(
+      text: expense == null ? '' : expense.amount.toStringAsFixed(2),
+    );
+
+    _selectedCategory = expense?.category;
+  }
 
   void _saveExpense() {
     final isValid = _formKey.currentState!.validate();
@@ -27,11 +48,20 @@ class _AddExpensePageState extends State<AddExpensePage> {
 
     final amount = double.parse(_amountController.text.replaceAll(',', '.'));
 
-    final expense = Expense(
-      title: _titleController.text.trim(),
-      category: _selectedCategory!,
-      amount: amount,
-    );
+    final existingExpense = widget.expenseToEdit;
+
+    final expense = existingExpense == null
+        ? Expense(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            title: _titleController.text.trim(),
+            category: _selectedCategory!,
+            amount: amount,
+          )
+        : existingExpense.copyWith(
+            title: _titleController.text.trim(),
+            category: _selectedCategory!,
+            amount: amount,
+          );
 
     Navigator.pop(context, expense);
   }
@@ -40,13 +70,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('New Expense')),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit Expenses' : 'New Expense')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -63,10 +94,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Inform a Title';
-                    } else if (value.length <= 2) {
-                      return "Inform a valid value above two letters";
+                      return 'Inform a value';
                     }
+
                     return null;
                   },
                 ),
@@ -92,6 +122,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     if (value == null) {
                       return 'Select a category';
                     }
+
                     return null;
                   },
                 ),
@@ -108,7 +139,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Inform the Value';
+                      return 'Inform a value';
                     }
 
                     final amount = double.tryParse(value.replaceAll(',', '.'));
@@ -118,7 +149,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     }
 
                     if (amount <= 0) {
-                      return 'The value must be greater than zero';
+                      return 'The value must be greater than zero.';
                     }
 
                     return null;
@@ -127,7 +158,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _saveExpense,
-                  child: const Text('Add Expense'),
+                  child: Text(_isEditing ? 'Salve changes' : 'Add Expenses'),
                 ),
               ],
             ),
