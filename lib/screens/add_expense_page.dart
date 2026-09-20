@@ -64,6 +64,8 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Inform a Title';
+                    } else if (value.length <= 2) {
+                      return "Inform a valid value above two letters";
                     }
                     return null;
                   },

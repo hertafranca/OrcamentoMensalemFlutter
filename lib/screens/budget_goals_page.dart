@@ -84,7 +84,7 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'State a goal.';
+                          return 'The goal status is incorrect.';
                         }
 
                         final goal = double.tryParse(
