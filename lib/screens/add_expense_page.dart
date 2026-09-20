@@ -77,7 +77,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Edit Expenses' : 'New Expense')),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit Expense' : 'New Expense')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -94,7 +94,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Inform a value';
+                      return 'Inform a Title';
                     }
 
                     return null;
@@ -149,7 +149,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     }
 
                     if (amount <= 0) {
-                      return 'The value must be greater than zero.';
+                      return 'The value must be greater than zero';
                     }
 
                     return null;
@@ -158,7 +158,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _saveExpense,
-                  child: Text(_isEditing ? 'Salve changes' : 'Add Expenses'),
+                  child: Text(_isEditing ? 'Save Change' : 'Add Expense'),
                 ),
               ],
             ),
