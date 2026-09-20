@@ -10,6 +10,7 @@ void main() {
     title: 'Brasao´s Dinner',
     category: ExpenseCategory.restaurant,
     amount: 35.50,
+    id: '',
   );
   //print(expense.title);
   // print(expense.category.label);
