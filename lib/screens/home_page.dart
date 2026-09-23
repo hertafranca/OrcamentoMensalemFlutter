@@ -13,32 +13,52 @@ class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() =>
+      _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final LocalStorageService _storage = LocalStorageService();
+  final LocalStorageService _storage =
+      LocalStorageService();
 
   final List<Expense> _expenses = [];
 
   final Map<ExpenseCategory, double> _goals = {
-    for (final category in ExpenseCategory.values) category: 0.0,
+    for (final category
+        in ExpenseCategory.values)
+      category: 0.0,
   };
 
   bool _isLoading = true;
 
   double get _totalSpent {
-    return _expenses.fold(0, (total, expense) => total + expense.amount);
+    return _expenses.fold(
+      0,
+      (total, expense) =>
+          total + expense.amount,
+    );
   }
 
   double get _totalBudget {
-    return _goals.values.fold(0, (total, goal) => total + goal);
+    return _goals.values.fold(
+      0,
+      (total, goal) => total + goal,
+    );
   }
 
-  double spentByCategory(ExpenseCategory category) {
+  double spentByCategory(
+    ExpenseCategory category,
+  ) {
     return _expenses
-        .where((expense) => expense.category == category)
-        .fold(0, (total, expense) => total + expense.amount);
+        .where(
+          (expense) =>
+              expense.category == category,
+        )
+        .fold(
+          0,
+          (total, expense) =>
+              total + expense.amount,
+        );
   }
 
   @override
@@ -49,8 +69,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadData() async {
-    final expenses = await _storage.loadExpenses();
-    final goals = await _storage.loadGoals();
+    final expenses =
+        await _storage.loadExpenses();
+
+    final goals =
+        await _storage.loadGoals();
 
     if (!mounted) {
       return;
@@ -70,9 +93,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _openAddExpense() async {
-    final expense = await Navigator.push<Expense>(
+    final expense =
+        await Navigator.push<Expense>(
       context,
-      MaterialPageRoute(builder: (context) => const AddExpensePage()),
+      MaterialPageRoute(
+        builder: (context) =>
+            const AddExpensePage(),
+      ),
     );
 
     if (expense == null || !mounted) {
@@ -83,14 +110,118 @@ class _HomePageState extends State<HomePage> {
       _expenses.add(expense);
     });
 
-    await _storage.saveExpenses(_expenses);
+    await _storage.saveExpenses(
+      _expenses,
+    );
+  }
+
+  Future<void> _editExpense(
+    Expense expense,
+  ) async {
+    final updatedExpense =
+        await Navigator.push<Expense>(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            AddExpensePage(
+          expenseToEdit: expense,
+        ),
+      ),
+    );
+
+    if (updatedExpense == null ||
+        !mounted) {
+      return;
+    }
+
+    final index = _expenses.indexWhere(
+      (item) =>
+          item.id == updatedExpense.id,
+    );
+
+    if (index == -1) {
+      return;
+    }
+
+    setState(() {
+      _expenses[index] = updatedExpense;
+    });
+
+    await _storage.saveExpenses(
+      _expenses,
+    );
+  }
+
+  Future<void> _deleteExpense(
+    Expense expense,
+  ) async {
+    final shouldDelete =
+        await showDialog<bool>(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text(
+                    'Delete Expense',
+                  ),
+                  content: Text(
+                    'Do you really want to delete? "${expense.title}"?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(
+                          context,
+                          false,
+                        );
+                      },
+                      child: const Text(
+                        'Cancel',
+                      ),
+                    ),
+                    FilledButton(
+                      onPressed: () {
+                        Navigator.pop(
+                          context,
+                          true,
+                        );
+                      },
+                      child: const Text(
+                        'Delete',
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ) ??
+            false;
+
+    if (!shouldDelete || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _expenses.removeWhere(
+        (item) =>
+            item.id == expense.id,
+      );
+    });
+
+    await _storage.saveExpenses(
+      _expenses,
+    );
   }
 
   Future<void> _openBudgetGoals() async {
-    final goals = await Navigator.push<Map<ExpenseCategory, double>>(
+    final goals =
+        await Navigator.push<
+            Map<ExpenseCategory, double>
+        >(
       context,
       MaterialPageRoute(
-        builder: (context) => BudgetGoalsPage(currentGoals: Map.of(_goals)),
+        builder: (context) =>
+            BudgetGoalsPage(
+          currentGoals: Map.of(_goals),
+        ),
       ),
     );
 
@@ -111,61 +242,109 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mounthly Budget'),
+        title:
+            const Text('Monthly Budget'),
         actions: [
           IconButton(
-            onPressed: _isLoading ? null : _openBudgetGoals,
+            onPressed: _isLoading
+                ? null
+                : _openBudgetGoals,
             icon: const Icon(Icons.tune),
-            tooltip: 'Define Goals',
+            tooltip: 'Edit Goals',
           ),
         ],
       ),
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child:
+                    CircularProgressIndicator(),
+              )
             : SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding:
+                    const EdgeInsets.all(16),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.stretch,
                   children: [
-                    BudgetSummaryCard(budget: _totalBudget, spent: _totalSpent),
-                    const SizedBox(height: 24),
+                    BudgetSummaryCard(
+                      budget: _totalBudget,
+                      spent: _totalSpent,
+                    ),
+                    const SizedBox(
+                      height: 24,
+                    ),
                     const Text(
-                      'Goals by category',
+                      'Goals by Category',
                       style: TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontWeight:
+                            FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    ...ExpenseCategory.values.map(
-                      (category) => CategoryBudgetCard(
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ...ExpenseCategory.values
+                        .map(
+                      (category) =>
+                          CategoryBudgetCard(
                         category: category,
-                        goal: _goals[category] ?? 0,
-                        spent: spentByCategory(category),
+                        goal:
+                            _goals[category] ??
+                                0,
+                        spent:
+                            spentByCategory(
+                          category,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(
+                      height: 24,
+                    ),
                     const Text(
-                      'Transaction History',
+                      'Transactions Historic',
                       style: TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontWeight:
+                            FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(
+                      height: 8,
+                    ),
                     if (_expenses.isEmpty)
                       const Card(
                         child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text('No transactions registered'),
+                          padding:
+                              EdgeInsets.all(
+                            16,
+                          ),
+                          child: Text(
+                            'No transactions registered.',
+                          ),
                         ),
                       )
                     else
                       ..._expenses.map(
-                        (expense) => ExpenseTile(expense: expense),
+                        (expense) =>
+                            ExpenseTile(
+                          expense: expense,
+                          onEdit: () {
+                            _editExpense(
+                              expense,
+                            );
+                          },
+                          onDelete: () {
+                            _deleteExpense(
+                              expense,
+                            );
+                          },
+                        ),
                       ),
-                    const SizedBox(height: 80),
+                    const SizedBox(
+                      height: 80,
+                    ),
                   ],
                 ),
               ),
@@ -174,7 +353,8 @@ class _HomePageState extends State<HomePage> {
           ? null
           : FloatingActionButton(
               onPressed: _openAddExpense,
-              child: const Icon(Icons.add),
+              child:
+                  const Icon(Icons.add),
             ),
     );
   }
