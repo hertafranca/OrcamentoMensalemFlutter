@@ -5,16 +5,23 @@ import '../models/expense_category.dart';
 class BudgetGoalsPage extends StatefulWidget {
   final Map<ExpenseCategory, double> currentGoals;
 
-  const BudgetGoalsPage({super.key, required this.currentGoals});
+  const BudgetGoalsPage({
+    super.key,
+    required this.currentGoals,
+  });
 
   @override
-  State<BudgetGoalsPage> createState() => _BudgetGoalsPageState();
+  State<BudgetGoalsPage> createState() =>
+      _BudgetGoalsPageState();
 }
 
-class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
+class _BudgetGoalsPageState
+    extends State<BudgetGoalsPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late final Map<ExpenseCategory, TextEditingController> _controllers;
+  late final Map<
+      ExpenseCategory,
+      TextEditingController> _controllers;
 
   @override
   void initState() {
@@ -23,23 +30,31 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
     _controllers = {
       for (final category in ExpenseCategory.values)
         category: TextEditingController(
-          text: (widget.currentGoals[category] ?? 0).toStringAsFixed(2),
+          text: (widget.currentGoals[category] ?? 0)
+              .toStringAsFixed(2),
         ),
     };
   }
 
   void _saveGoals() {
-    final isValid = _formKey.currentState!.validate();
+    final isValid =
+        _formKey.currentState!.validate();
 
     if (!isValid) {
       return;
     }
 
-    final goals = <ExpenseCategory, double>{};
+    final goals =
+        <ExpenseCategory, double>{};
 
-    for (final category in ExpenseCategory.values) {
-      final text = _controllers[category]!.text.replaceAll(',', '.');
-      goals[category] = double.parse(text);
+    for (final category
+        in ExpenseCategory.values) {
+      final text = _controllers[category]!
+          .text
+          .replaceAll(',', '.');
+
+      goals[category] =
+          double.parse(text);
     }
 
     Navigator.pop(context, goals);
@@ -47,66 +62,91 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
 
   @override
   void dispose() {
-    for (final controller in _controllers.values) {
+    for (final controller
+        in _controllers.values) {
       controller.dispose();
     }
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Goals for the month')),
+      appBar: AppBar(
+        title: const Text('Monthly Goals'),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment:
+                  CrossAxisAlignment.stretch,
               children: [
                 const Text(
-                  'Inform how much you intend to spend in each category.',
+                  'Edit how much you want to spend in each category.',
                 ),
                 const SizedBox(height: 24),
-                ...ExpenseCategory.values.map((category) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: TextFormField(
-                      controller: _controllers[category],
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
+                ...ExpenseCategory.values.map(
+                  (category) {
+                    return Padding(
+                      padding:
+                          const EdgeInsets.only(
+                        bottom: 16,
                       ),
-                      decoration: InputDecoration(
-                        labelText: category.label,
-                        prefixText: '€ ',
-                        border: const OutlineInputBorder(),
+                      child: TextFormField(
+                        controller:
+                            _controllers[category],
+                        keyboardType:
+                            const TextInputType
+                                .numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration:
+                            InputDecoration(
+                          labelText:
+                              category.label,
+                          prefixText: '€ ',
+                          border:
+                              const OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null ||
+                              value
+                                  .trim()
+                                  .isEmpty) {
+                            return 'Inform a goal';
+                          }
+
+                          final goal =
+                              double.tryParse(
+                            value.replaceAll(
+                              ',',
+                              '.',
+                            ),
+                          );
+
+                          if (goal == null) {
+                            return 'Inform a valid value';
+                          }
+
+                          if (goal < 0) {
+                            return 'The goal cannot be negative';
+                          }
+
+                          return null;
+                        },
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'The goal status is incorrect.';
-                        }
-
-                        final goal = double.tryParse(
-                          value.replaceAll(',', '.'),
-                        );
-
-                        if (goal == null) {
-                          return 'Inform a valid value.';
-                        }
-
-                        if (goal < 0) {
-                          return 'The goal cannot be negative.';
-                        }
-
-                        return null;
-                      },
-                    ),
-                  );
-                }),
+                    );
+                  },
+                ),
                 ElevatedButton(
                   onPressed: _saveGoals,
-                  child: const Text('Save Goals'),
+                  child: const Text(
+                    'Save Changes',
+                  ),
                 ),
               ],
             ),
