@@ -53,7 +53,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
       initialDate: _selectedDate.isAfter(today) ? today : _selectedDate,
       firstDate: DateTime(2000),
       lastDate: today,
-      helpText: 'Data do gasto',
+      helpText: ' Expense Date ',
     );
 
     if (pickedDate == null || !mounted) {
@@ -117,7 +117,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(
-                    labelText: 'Título',
+                    labelText: 'Title',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
