@@ -11,6 +11,10 @@ class LocalStorageService {
 
   final SharedPreferencesAsync _preferences = SharedPreferencesAsync();
 
+  Map<ExpenseCategory, double> _emptyGoals() {
+    return {for (final category in ExpenseCategory.values) category: 0.0};
+  }
+
   Future<void> saveExpenses(List<Expense> expenses) async {
     final expensesAsJson = expenses.map((expense) => expense.toJson()).toList();
 
@@ -54,7 +58,7 @@ class LocalStorageService {
     final encodedGoals = await _preferences.getString(_goalsKey);
 
     if (encodedGoals == null || encodedGoals.isEmpty) {
-      return {for (final category in ExpenseCategory.values) category: 0.0};
+      return _emptyGoals();
     }
 
     try {
@@ -62,12 +66,18 @@ class LocalStorageService {
         jsonDecode(encodedGoals) as Map,
       );
 
-      return {
-        for (final category in ExpenseCategory.values)
-          category: (decodedGoals[category.name] as num?)?.toDouble() ?? 0.0,
-      };
+      final goals = _emptyGoals();
+
+      for (final entry in decodedGoals.entries) {
+        final category = ExpenseCategory.fromName(entry.key);
+        final value = (entry.value as num?)?.toDouble() ?? 0.0;
+
+        goals[category] = value;
+      }
+
+      return goals;
     } catch (_) {
-      return {for (final category in ExpenseCategory.values) category: 0.0};
+      return _emptyGoals();
     }
   }
 }
