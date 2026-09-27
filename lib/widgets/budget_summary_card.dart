@@ -26,7 +26,7 @@ class BudgetSummaryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Summary of the month',
+              '📝Summary of the month',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -46,11 +46,11 @@ class BudgetSummaryCard extends StatelessWidget {
               ),
             const SizedBox(height: 16),
             if (budget == 0 && spent == 0)
-              const Text('Define your monthly goals to get started.')
+              const Text('Define your monthly goals to get started🎯.')
             else if (isOverBudget)
-              const Text('Budget exceeded.')
+              const Text('Budget exceeded💸.')
             else
-              const Text('You are within budget.'),
+              const Text('You are within budget💰.'),
           ],
         ),
       ),
