@@ -13,7 +13,6 @@ As funcionalidades que vamos adicionar são:
 5. Seletor de mês, com resumo e metas calculados apenas com os gastos do mês escolhido.
 
 ---
-
 # Como usar este roteiro
 
 Este guia segue a mesma regra das fases anteriores:
