@@ -51,11 +51,11 @@ class DateFormatter {
     final yesterday = DateTime(now.year, now.month, now.day - 1);
 
     if (isSameDay(date, today)) {
-      return 'Hoje';
+      return 'TODAY';
     }
 
     if (isSameDay(date, yesterday)) {
-      return 'Ontem';
+      return 'YESTERDAY';
     }
 
     final monthName = _monthNames[date.month - 1];

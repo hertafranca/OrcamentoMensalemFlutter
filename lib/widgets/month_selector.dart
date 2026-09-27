@@ -18,16 +18,13 @@ class MonthSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 4,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: Row(
           children: [
             IconButton(
               onPressed: onPrevious,
               icon: const Icon(Icons.chevron_left),
-              tooltip: '🔙Before the Monthly',
+              tooltip: 'Before the Monthly',
             ),
             Expanded(
               child: Text(
@@ -42,7 +39,7 @@ class MonthSelector extends StatelessWidget {
             IconButton(
               onPressed: onNext,
               icon: const Icon(Icons.chevron_right),
-              tooltip:🔜 'After the Monthly',
+              tooltip: 'After the Monthly',
             ),
           ],
         ),
