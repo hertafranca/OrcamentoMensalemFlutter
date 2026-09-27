@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/expense.dart';
 import '../models/expense_category.dart';
+import '../utils/date_formatter.dart';
 
 class AddExpensePage extends StatefulWidget {
   final Expense? expenseToEdit;
@@ -19,6 +20,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   late final TextEditingController _amountController;
 
   ExpenseCategory? _selectedCategory;
+  late DateTime _selectedDate;
 
   bool get _isEditing {
     return widget.expenseToEdit != null;
@@ -37,6 +39,30 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
 
     _selectedCategory = expense?.category;
+
+    // Novo gasto: começa com a data de hoje.
+    // Edição: começa com a data do gasto.
+    _selectedDate = expense?.date ?? DateFormatter.onlyDate(DateTime.now());
+  }
+
+  Future<void> _pickDate() async {
+    final today = DateFormatter.onlyDate(DateTime.now());
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate.isAfter(today) ? today : _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: today,
+      helpText: 'Data do gasto',
+    );
+
+    if (pickedDate == null || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _selectedDate = DateFormatter.onlyDate(pickedDate);
+    });
   }
 
   void _saveExpense() {
@@ -56,11 +82,13 @@ class _AddExpensePageState extends State<AddExpensePage> {
             title: _titleController.text.trim(),
             category: _selectedCategory!,
             amount: amount,
+            date: _selectedDate,
           )
         : existingExpense.copyWith(
             title: _titleController.text.trim(),
             category: _selectedCategory!,
             amount: amount,
+            date: _selectedDate,
           );
 
     Navigator.pop(context, expense);
@@ -77,7 +105,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_isEditing ? 'Edit Expense' : 'New Expense')),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit expense' : 'New expense')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -89,12 +117,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
                 TextFormField(
                   controller: _titleController,
                   decoration: const InputDecoration(
-                    labelText: 'Title',
+                    labelText: 'Título',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Inform a Title';
+                      return 'Inform a title';
                     }
 
                     return null;
@@ -139,7 +167,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Inform a value';
+                      return 'Inform the value';
                     }
 
                     final amount = double.tryParse(value.replaceAll(',', '.'));
@@ -155,10 +183,23 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
+                InkWell(
+                  onTap: _pickDate,
+                  borderRadius: BorderRadius.circular(4),
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Date',
+                      border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.calendar_today),
+                    ),
+                    child: Text(DateFormatter.fullDate(_selectedDate)),
+                  ),
+                ),
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _saveExpense,
-                  child: Text(_isEditing ? 'Save Change' : 'Add Expense'),
+                  child: Text(_isEditing ? 'Salve change' : 'Add expense'),
                 ),
               ],
             ),
