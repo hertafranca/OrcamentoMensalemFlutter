@@ -5,17 +5,6 @@ import 'package:orcamento2026/models/expense_category.dart';
 import 'screens/home_page.dart';
 
 void main() {
-  //print(ExpenseCategory.restaurant.label);
-  final expense = Expense(
-    title: 'Brasao´s Dinner',
-    category: ExpenseCategory.food,
-    amount: 35.50,
-    id: '',
-  );
-  //print(expense.title);
-  // print(expense.category.label);
-  // print(expense.amount);
-
   runApp(const BudgetApp());
 }
 
