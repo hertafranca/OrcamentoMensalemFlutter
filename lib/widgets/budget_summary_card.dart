@@ -50,7 +50,7 @@ class BudgetSummaryCard extends StatelessWidget {
             else if (isOverBudget)
               const Text('Budget exceeded💸.')
             else
-              const Text('You are within budget💰.'),
+              const Text('You are within budget💰💰💰.'),
           ],
         ),
       ),
