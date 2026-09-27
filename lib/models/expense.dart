@@ -41,7 +41,7 @@ class Expense {
 
     final category = ExpenseCategory.values.firstWhere(
       (category) => category.name == categoryName,
-      orElse: () => ExpenseCategory.restaurant,
+      orElse: () => ExpenseCategory.food,
     );
 
     return Expense(

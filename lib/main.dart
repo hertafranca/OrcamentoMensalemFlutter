@@ -8,7 +8,7 @@ void main() {
   //print(ExpenseCategory.restaurant.label);
   final expense = Expense(
     title: 'Brasao´s Dinner',
-    category: ExpenseCategory.restaurant,
+    category: ExpenseCategory.food,
     amount: 35.50,
     id: '',
   );
