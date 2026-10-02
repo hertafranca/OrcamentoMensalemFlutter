@@ -28,3 +28,4 @@ enum ExpenseCategory {
     );
   }
 }
+ // TODO: Adicionar um retorno padrão ou lançar uma exceção caso o nome não seja mapeado
