@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/expense_category.dart';
-
+// Tela para definir os objetivos de gastos mensais por categoria.
 class BudgetGoalsPage extends StatefulWidget {
   final Map<ExpenseCategory, double> currentGoals;
 
@@ -10,7 +10,7 @@ class BudgetGoalsPage extends StatefulWidget {
   @override
   State<BudgetGoalsPage> createState() => _BudgetGoalsPageState();
 }
-
+// Estado da tela de objetivos de gastos mensais.
 class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
   final _formKey = GlobalKey<FormState>();
 
@@ -42,7 +42,7 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
 
     return total;
   }
-
+// Formata o valor monetário para exibição.
   String _formatMoney(double value) {
     return '€ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
   }
@@ -64,7 +64,7 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
 
     Navigator.pop(context, goals);
   }
-
+// Libera os controladores de texto quando a tela é descartada.
   @override
   void dispose() {
     for (final controller in _controllers.values) {
@@ -73,7 +73,7 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
 
     super.dispose();
   }
-
+// Constrói a interface da tela de objetivos de gastos mensais.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,11 +89,13 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
                 const Text(
                   'Define how much you want to spend by month in each category.',
                 ),
+                // Espaço entre o texto explicativo e os campos de entrada.
                 const SizedBox(height: 8),
                 const Text(
                   'These goals apply to all months. '
                   'Consumption is calculated separately for each month.',
                 ),
+                // Espaço entre o texto explicativo e os campos de entrada.
                 const SizedBox(height: 24),
                 ...ExpenseCategory.values.map((category) {
                   return Padding(
@@ -103,6 +105,7 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
+                      // Espaço entre o campo de entrada e o rótulo.
                       decoration: InputDecoration(
                         labelText: category.label,
                         prefixText: '€ ',
@@ -115,7 +118,7 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
                         if (value == null || value.trim().isEmpty) {
                           return 'Inform a goal.';
                         }
-
+// Valida se o valor digitado é um número válido e não negativo.
                         final goal = double.tryParse(
                           value.replaceAll(',', '.'),
                         );
@@ -127,7 +130,7 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
                         if (goal < 0) {
                           return 'The goal must be negative.';
                         }
-
+// Retorna null se a validação for bem-sucedida.
                         return null;
                       },
                     ),
@@ -143,13 +146,17 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
                             'Monthly Total',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
+                          // Espaço entre o texto e o valor total.
                         ),
+                        // Exibe o valor total formatado.
                         Text(
                           _formatMoney(_totalGoals),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
+                        // Espaço entre o valor total e o ícone de informação.
                       ],
                     ),
+                    // Espaço entre o valor total e o ícone de informação.
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -165,3 +172,8 @@ class _BudgetGoalsPageState extends State<BudgetGoalsPage> {
     );
   }
 }
+// A tela de objetivos de gastos mensais permite que o 
+//usuário defina metas de gastos para cada categoria de despesa.
+// Ela utiliza um formulário para validar os valores inseridos e 
+//calcula o total mensal com base nos valores fornecidos. 
+//Ao salvar, os objetivos são retornados para a tela anterior.
