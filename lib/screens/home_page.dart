@@ -1,3 +1,4 @@
+// lib/screens/home_page.dart
 import 'package:flutter/material.dart';
 
 import '../models/expense.dart';
@@ -17,7 +18,7 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
+// A tela principal do aplicativo de orçamento mensal.
 class _HomePageState extends State<HomePage> {
   final LocalStorageService _storage = LocalStorageService();
 
@@ -26,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   final Map<ExpenseCategory, double> _goals = {
     for (final category in ExpenseCategory.values) category: 0.0,
   };
-
+// Indica se os dados estão sendo carregados do armazenamento local.
   bool _isLoading = true;
 
   // O mês selecionado é guardado como o dia 1 daquele mês.
@@ -43,7 +44,7 @@ class _HomePageState extends State<HomePage> {
           (expense) => DateFormatter.isSameMonth(expense.date, _selectedMonth),
         )
         .toList();
-
+// Ordena os gastos do mês selecionado do mais recente para o mais antigo.
     expenses.sort((a, b) {
       final byDate = b.date.compareTo(a.date);
 
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
 
     return groups;
   }
-
+// Calcula o total gasto no mês selecionado.
   double get _totalSpent {
     return _monthExpenses.fold(0.0, (total, expense) => total + expense.amount);
   }
@@ -84,7 +85,7 @@ class _HomePageState extends State<HomePage> {
         .where((expense) => expense.category == category)
         .fold(0.0, (total, expense) => total + expense.amount);
   }
-
+// Navega para o mês anterior.
   void _goToPreviousMonth() {
     setState(() {
       _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month - 1);
@@ -95,7 +96,7 @@ class _HomePageState extends State<HomePage> {
     if (_isCurrentMonth) {
       return;
     }
-
+// Navega para o próximo mês, se não for o mês atual.
     setState(() {
       _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month + 1);
     });
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
 
     _loadData();
   }
-
+// Carrega os gastos e objetivos salvos do armazenamento local.
   Future<void> _loadData() async {
     final expenses = await _storage.loadExpenses();
     final goals = await _storage.loadGoals();
@@ -128,7 +129,7 @@ class _HomePageState extends State<HomePage> {
       _isLoading = false;
     });
   }
-
+// Abre a tela para adicionar um novo gasto.
   Future<void> _openAddExpense() async {
     final expense = await Navigator.push<Expense>(
       context,
@@ -138,7 +139,7 @@ class _HomePageState extends State<HomePage> {
     if (expense == null || !mounted) {
       return;
     }
-
+// Adiciona o novo gasto à lista e salva no armazenamento local.
     setState(() {
       _expenses.add(expense);
 
@@ -148,7 +149,7 @@ class _HomePageState extends State<HomePage> {
 
     await _storage.saveExpenses(_expenses);
   }
-
+// Abre a tela para editar um gasto existente.
   Future<void> _editExpense(Expense expense) async {
     final updatedExpense = await Navigator.push<Expense>(
       context,
@@ -160,7 +161,7 @@ class _HomePageState extends State<HomePage> {
     if (updatedExpense == null || !mounted) {
       return;
     }
-
+// Encontra o índice do gasto atualizado na lista e atualiza os dados.
     final index = _expenses.indexWhere((item) => item.id == updatedExpense.id);
 
     if (index == -1) {
@@ -179,7 +180,7 @@ class _HomePageState extends State<HomePage> {
 
     await _storage.saveExpenses(_expenses);
   }
-
+//  Exibe um diálogo de confirmação antes de excluir um gasto.
   Future<void> _deleteExpense(Expense expense) async {
     final shouldDelete =
         await showDialog<bool>(
@@ -208,7 +209,7 @@ class _HomePageState extends State<HomePage> {
           },
         ) ??
         false;
-
+// Se o usuário não confirmou a exclusão ou a tela não está mais montada, retorna sem fazer nada.
     if (!shouldDelete || !mounted) {
       return;
     }
@@ -219,7 +220,7 @@ class _HomePageState extends State<HomePage> {
 
     await _storage.saveExpenses(_expenses);
   }
-
+// Abre a tela de objetivos de gastos mensais para edição.
   Future<void> _openBudgetGoals() async {
     final goals = await Navigator.push<Map<ExpenseCategory, double>>(
       context,
@@ -231,7 +232,7 @@ class _HomePageState extends State<HomePage> {
     if (goals == null || !mounted) {
       return;
     }
-
+// Atualiza os objetivos de gastos e salva no armazenamento local.
     setState(() {
       _goals
         ..clear()
@@ -244,7 +245,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final expensesByDay = _expensesByDay;
-
+// Constrói a interface da tela principal do aplicativo de orçamento mensal.
     return Scaffold(
       appBar: AppBar(
         title: const Text('📈Monthly Budget'),
@@ -254,8 +255,10 @@ class _HomePageState extends State<HomePage> {
             icon: const Icon(Icons.tune),
             tooltip: '✎Edit Goals',
           ),
+          // Espaço entre o botão de edição de objetivos e a borda da tela.
         ],
       ),
+      // Espaço entre a barra de aplicativos e o conteúdo da tela.
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -268,7 +271,7 @@ class _HomePageState extends State<HomePage> {
                       selectedMonth: _selectedMonth,
                       onPrevious: _goToPreviousMonth,
                       onNext: _isCurrentMonth ? null : _goToNextMonth,
-                    ),
+                    ),//  Espaço entre o seletor de mês e o resumo do orçamento.
                     const SizedBox(height: 16),
                     BudgetSummaryCard(budget: _totalBudget, spent: _totalSpent),
                     const SizedBox(height: 24),
@@ -277,7 +280,7 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                      ),
+                      ),// Espaço entre o título e os cartões de categoria. 
                     ),
                     const SizedBox(height: 8),
                     ...ExpenseCategory.values.map(
@@ -285,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                         category: category,
                         goal: _goals[category] ?? 0,
                         spent: spentByCategory(category),
-                      ),
+                      ),// Espaço entre os cartões de categoria.
                     ),
                     const SizedBox(height: 24),
                     const Text(
@@ -294,6 +297,7 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
+                      // Espaço entre o título e a lista de gastos.
                     ),
                     const SizedBox(height: 8),
                     if (expensesByDay.isEmpty)
@@ -302,6 +306,8 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.all(16),
                           child: Text('💵No expenses this month.'),
                         ),
+                        // Espaço entre a mensagem de ausência de gastos e 
+                        //a borda da tela.
                       )
                     else
                       ...expensesByDay.entries.map(
@@ -315,10 +321,11 @@ class _HomePageState extends State<HomePage> {
                             _deleteExpense(expense);
                           },
                         ),
+                        // Espaço entre os grupos de gastos por dia.  
                       ),
                     const SizedBox(height: 80),
                   ],
-                ),
+                ),// Espaço entre o conteúdo da tela e a borda inferior da tela.
               ),
       ),
       floatingActionButton: _isLoading
@@ -326,7 +333,7 @@ class _HomePageState extends State<HomePage> {
           : FloatingActionButton(
               onPressed: _openAddExpense,
               child: const Icon(Icons.add),
-            ),
-    );
+            ),// Espaço entre o botão flutuante e a borda inferior da tela.
+    );// Espaço entre o botão flutuante e a borda inferior da tela.
   }
 }
