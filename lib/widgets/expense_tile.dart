@@ -6,18 +6,20 @@ class ExpenseTile extends StatelessWidget {
   final Expense expense;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-
+// Construtor do widget ExpenseTile, que recebe uma despesa,
+// uma função de edição e uma função de exclusão como parâmetros.
   const ExpenseTile({
     super.key,
     required this.expense,
     required this.onEdit,
     required this.onDelete,
   });
-
+// Função privada para formatar o valor monetário da despesa.
   String _formatMoney(double value) {
     return '€ ${value.toStringAsFixed(2).replaceAll('.', ',')}';
   }
-
+// Constrói o widget que exibe as informações da despesa,
+// incluindo título, categoria, valor e opções de edição/exclusão.
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -40,7 +42,8 @@ class ExpenseTile extends StatelessWidget {
                 if (value == 'edit') {
                   onEdit();
                 }
-
+// Chama a função de exclusão quando a opção "delete" é selecionada
+                else  
                 if (value == 'delete') {
                   onDelete();
                 }
@@ -56,6 +59,8 @@ class ExpenseTile extends StatelessWidget {
                         Text('Edit'),
                       ],
                     ),
+                    // Chama a função de edição quando a 
+                    //opção "edit" é selecionada
                   ),
                   PopupMenuItem(
                     value: 'delete',
@@ -66,6 +71,8 @@ class ExpenseTile extends StatelessWidget {
                         Text('Delete'),
                       ],
                     ),
+                    // Chama a função de exclusão quando 
+                    //a opção "delete" é selecionada
                   ),
                 ];
               },
