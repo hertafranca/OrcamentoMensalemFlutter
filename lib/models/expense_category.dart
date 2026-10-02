@@ -6,7 +6,7 @@ enum ExpenseCategory {
   home('🏠🛜💡💧HOME'),
   education('👩‍💻📚🎓🎯EDUCATION'),
   other('💫🦋🌷💫OTHER');
-
+//criar categorias .
   final String label;
 
   const ExpenseCategory(this.label);
@@ -16,14 +16,14 @@ enum ExpenseCategory {
   static ExpenseCategory fromName(String name) {
     if (name == 'restaurant') {
       return ExpenseCategory.food;
-    }
+    }/// Converte uma string com o nome da categoria para o enum.
 
     if (name == 'clothes') {
       return ExpenseCategory.shopping;
     }
 
     return ExpenseCategory.values.firstWhere(
-      (category) => category.name == name,
+      (category) => category.name == name,// Se o nome for 'restaurant', mapeia para a categoria de alimentação (food)
       orElse: () => ExpenseCategory.other,
     );
   }
