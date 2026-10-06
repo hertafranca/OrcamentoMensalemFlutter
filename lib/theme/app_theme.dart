@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'app_colors.dart';
+
 class AppTheme {
   static ThemeData dark() {
     const colorScheme = ColorScheme(
@@ -61,13 +63,9 @@ class AppTheme {
         contentTextStyle: const TextStyle(color: AppColors.textPrimary),
         actionTextColor: AppColors.richGold,
         closeIconColor: AppColors.textSecondary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.border,
-      ),
+      dividerTheme: const DividerThemeData(color: AppColors.border),
     );
   }
 
@@ -76,9 +74,11 @@ class AppTheme {
   static TextTheme _textTheme() {
     final baseTextTheme = ThemeData(brightness: Brightness.dark).textTheme;
 
-    final bodyTextTheme = GoogleFonts.interTextTheme(baseTextTheme);
-    final titleTextTheme = GoogleFonts.playfairDisplayTextTheme(baseTextTheme);
-
+    final bodyTextTheme = applyGoogleFont(baseTextTheme, GoogleFonts.inter);
+    final titleTextTheme = applyGoogleFont(
+      baseTextTheme,
+      GoogleFonts.playfairDisplay,
+    );
     return bodyTextTheme
         .copyWith(
           displayLarge: titleTextTheme.displayLarge,
@@ -109,10 +109,32 @@ class AppTheme {
       prefixIcon: prefixIcon,
       filled: true,
       fillColor: AppColors.surface,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
     );
   }
 }
- 
+
+TextTheme applyGoogleFont(
+  TextTheme base,
+  TextStyle Function({TextStyle? textStyle}) font,
+) {
+  TextStyle? f(TextStyle? s) => s == null ? null : font(textStyle: s);
+
+  return base.copyWith(
+    displayLarge: f(base.displayLarge),
+    displayMedium: f(base.displayMedium),
+    displaySmall: f(base.displaySmall),
+    headlineLarge: f(base.headlineLarge),
+    headlineMedium: f(base.headlineMedium),
+    headlineSmall: f(base.headlineSmall),
+    titleLarge: f(base.titleLarge),
+    titleMedium: f(base.titleMedium),
+    titleSmall: f(base.titleSmall),
+    bodyLarge: f(base.bodyLarge),
+    bodyMedium: f(base.bodyMedium),
+    bodySmall: f(base.bodySmall),
+    labelLarge: f(base.labelLarge),
+    labelMedium: f(base.labelMedium),
+    labelSmall: f(base.labelSmall),
+  );
+}
