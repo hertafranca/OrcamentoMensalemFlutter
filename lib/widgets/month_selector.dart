@@ -1,56 +1,68 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
 import '../utils/date_formatter.dart';
 
 class MonthSelector extends StatelessWidget {
   final DateTime selectedMonth;
   final VoidCallback onPrevious;
   final VoidCallback? onNext;
-// Widget que permite selecionar o mês atual, com botões para
-// navegar para o mês anterior e próximo
+  final VoidCallback? onCurrentMonth;
+
   const MonthSelector({
     super.key,
     required this.selectedMonth,
     required this.onPrevious,
     required this.onNext,
+    this.onCurrentMonth,
   });
-// Constrói o widget que exibe o mês selecionado e os botões
-// para navegar entre os meses, chamando as funções onPrevious
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Row(
+    final textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      children: [
+        Row(
           children: [
-            IconButton(
+            IconButton.filledTonal(
               onPressed: onPrevious,
-              icon: const Icon(Icons.chevron_left),
-              tooltip: 'Before the Monthly',
+              icon: const Icon(Icons.chevron_left_rounded),
+              tooltip: 'Before Month',
             ),
-            // Exibe o mês e ano selecionados, formatados usando a função
-            // DateFormatter.monthAndYear, centralizados no widget
             Expanded(
-              child: Text(
-                DateFormatter.monthAndYear(selectedMonth),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                // Exibe o mês e ano selecionados, formatados usando a função
-                // DateFormatter.monthAndYear, centralizados no widget
+              child: Column(
+                children: [
+                  Text(
+                    'Selected Month',
+                    style: textTheme.labelSmall?.copyWith(
+                      color: AppColors.textSecondary,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    DateFormatter.monthAndYear(selectedMonth),
+                    textAlign: TextAlign.center,
+                    style: textTheme.headlineSmall,
+                  ),
+                ],
               ),
             ),
-            IconButton(
+            IconButton.filledTonal(
               onPressed: onNext,
-              icon: const Icon(Icons.chevron_right),
-              tooltip: 'After the Monthly',
+              icon: const Icon(Icons.chevron_right_rounded),
+              tooltip: 'Next Month',
             ),
-            // Botão para navegar para o próximo mês, chamando a função onNext
           ],
         ),
-      ),
+        if (onCurrentMonth != null)
+          TextButton.icon(
+            onPressed: onCurrentMonth,
+            icon: const Icon(Icons.today_rounded, size: 18),
+            label: const Text('Return to the current month'),
+          ),
+      ],
     );
   }
 }
