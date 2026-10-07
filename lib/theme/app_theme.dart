@@ -1,140 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-import 'app_colors.dart';
+import '../theme/app_colors.dart';
 
-class AppTheme {
-  static ThemeData dark() {
-    const colorScheme = ColorScheme(
-      brightness: Brightness.dark,
-      primary: AppColors.richGold,
-      onPrimary: AppColors.imperialPurple,
-      primaryContainer: AppColors.goldDark,
-      onPrimaryContainer: AppColors.goldLight,
-      secondary: AppColors.bottleGreen,
-      onSecondary: AppColors.textPrimary,
-      secondaryContainer: AppColors.bottleGreen,
-      onSecondaryContainer: AppColors.textPrimary,
-      error: AppColors.danger,
-      onError: AppColors.imperialPurple,
-      surface: AppColors.background,
-      onSurface: AppColors.textPrimary,
-      onSurfaceVariant: AppColors.textSecondary,
-      surfaceContainerLowest: AppColors.background,
-      surfaceContainerLow: AppColors.surface,
-      surfaceContainer: AppColors.surface,
-      surfaceContainerHigh: AppColors.surfaceHigh,
-      surfaceContainerHighest: AppColors.surfaceHigh,
-      outline: AppColors.border,
-      outlineVariant: AppColors.border,
-    );
+class EmptyState extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: colorScheme,
-      scaffoldBackgroundColor: AppColors.background,
-      textTheme: _textTheme(),
-      cardTheme: CardThemeData(
-        color: AppColors.surface,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: const BorderSide(color: AppColors.border),
+  const EmptyState({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 28,
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceHigh,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color: AppColors.richGold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: textTheme.titleLarge,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 20),
+              FilledButton(
+                onPressed: onAction,
+                child: Text(actionLabel!),
+              ),
+            ],
+          ],
         ),
       ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          minimumSize: const Size(64, 54),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-      ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: AppColors.richGold,
-        foregroundColor: AppColors.imperialPurple,
-      ),
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: AppColors.surfaceHigh,
-        contentTextStyle: const TextStyle(color: AppColors.textPrimary),
-        actionTextColor: AppColors.richGold,
-        closeIconColor: AppColors.textSecondary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      dividerTheme: const DividerThemeData(color: AppColors.border),
     );
   }
-
-  // Playfair Display para títulos e valores.
-  // Inter para todo o resto.
-  static TextTheme _textTheme() {
-    final baseTextTheme = ThemeData(brightness: Brightness.dark).textTheme;
-
-    final bodyTextTheme = applyGoogleFont(baseTextTheme, GoogleFonts.inter);
-    final titleTextTheme = applyGoogleFont(
-      baseTextTheme,
-      GoogleFonts.playfairDisplay,
-    );
-    return bodyTextTheme
-        .copyWith(
-          displayLarge: titleTextTheme.displayLarge,
-          displayMedium: titleTextTheme.displayMedium,
-          displaySmall: titleTextTheme.displaySmall,
-          headlineLarge: titleTextTheme.headlineLarge,
-          headlineMedium: titleTextTheme.headlineMedium,
-          headlineSmall: titleTextTheme.headlineSmall,
-          titleLarge: titleTextTheme.titleLarge,
-        )
-        .apply(
-          bodyColor: AppColors.textPrimary,
-          displayColor: AppColors.textPrimary,
-        );
-  }
-
-  // Aparência padrão dos campos de texto do app.
-  static InputDecoration input({
-    required String label,
-    String? hintText,
-    String? prefixText,
-    Widget? prefixIcon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      hintText: hintText,
-      prefixText: prefixText,
-      prefixIcon: prefixIcon,
-      filled: true,
-      fillColor: AppColors.surface,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-    );
-  }
-}
-
-TextTheme applyGoogleFont(
-  TextTheme base,
-  TextStyle Function({TextStyle? textStyle}) font,
-) {
-  TextStyle? f(TextStyle? s) => s == null ? null : font(textStyle: s);
-
-  return base.copyWith(
-    displayLarge: f(base.displayLarge),
-    displayMedium: f(base.displayMedium),
-    displaySmall: f(base.displaySmall),
-    headlineLarge: f(base.headlineLarge),
-    headlineMedium: f(base.headlineMedium),
-    headlineSmall: f(base.headlineSmall),
-    titleLarge: f(base.titleLarge),
-    titleMedium: f(base.titleMedium),
-    titleSmall: f(base.titleSmall),
-    bodyLarge: f(base.bodyLarge),
-    bodyMedium: f(base.bodyMedium),
-    bodySmall: f(base.bodySmall),
-    labelLarge: f(base.labelLarge),
-    labelMedium: f(base.labelMedium),
-    labelSmall: f(base.labelSmall),
-  );
 }
