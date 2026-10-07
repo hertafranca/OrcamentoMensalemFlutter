@@ -5,7 +5,7 @@ import '../models/expense.dart';
 import '../models/expense_category.dart';
 import '../services/local_storage_service.dart';
 import '../utils/date_formatter.dart';
-import '../utils/budget_summary_card.dart';
+import '../widgets/budget_summary_card.dart';
 import '../widgets/category_budget_card.dart';
 import '../widgets/expense_day_group.dart';
 import '../widgets/month_selector.dart';

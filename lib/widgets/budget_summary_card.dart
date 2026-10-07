@@ -31,33 +31,33 @@ class BudgetSummaryCard extends StatelessWidget {
     final String statusText;
 
     if (!hasBudget) {
-      label = 'Monthly Expense';
+      label = 'Monthly Budget';
       mainValue = spent;
       mainColor = AppColors.textPrimary;
       statusIcon = Icons.info_outline_rounded;
       statusColor = AppColors.textSecondary;
-      statusText = 'Define your goals to keep track of your budget.';
+      statusText = 'Set your goals to track the budget.';
     } else if (isOverBudget) {
       label = 'Over Budget';
       mainValue = balance.abs();
       mainColor = AppColors.danger;
       statusIcon = Icons.warning_amber_rounded;
       statusColor = AppColors.danger;
-      statusText = 'You have blown your budget this month.';
+      statusText = 'You have exceeded this month budget.';
     } else if (ratio >= 0.8) {
       label = 'Available to spend';
       mainValue = balance;
       mainColor = AppColors.richGold;
       statusIcon = Icons.error_outline_rounded;
       statusColor = AppColors.warning;
-      statusText = 'Attention: You have already used percent of the budget..';
+      statusText = 'You are close to exceeding your budget.';
     } else {
       label = 'Available to spend';
       mainValue = balance;
       mainColor = AppColors.richGold;
       statusIcon = Icons.check_circle_outline_rounded;
       statusColor = AppColors.success;
-      statusText = 'Everything under control: you used percent of the budget';
+      statusText = 'You are on track with your budget.';
     }
 
     return Container(
@@ -67,9 +67,14 @@ class BudgetSummaryCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.bottleGreen, AppColors.imperialPurple],
+          colors: [
+            AppColors.bottleGreen,
+            AppColors.imperialPurple,
+          ],
         ),
-        border: Border.all(color: AppColors.richGold.withValues(alpha: 0.5)),
+        border: Border.all(
+          color: AppColors.richGold.withValues(alpha: 0.5),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.35),
@@ -116,7 +121,10 @@ class BudgetSummaryCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _SummaryValue(label: 'Expense', value: spent),
+                child: _SummaryValue(
+                  label: 'Expense',
+                  value: spent,
+                ),
               ),
               Expanded(
                 child: _SummaryValue(
@@ -129,16 +137,28 @@ class BudgetSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                Icon(statusIcon, color: statusColor, size: 20),
+                Icon(
+                  statusIcon,
+                  color: statusColor,
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
-                Expanded(child: Text(statusText, style: textTheme.bodyMedium)),
+                Expanded(
+                  child: Text(
+                    statusText,
+                    style: textTheme.bodyMedium,
+                  ),
+                ),
               ],
             ),
           ),
@@ -164,18 +184,21 @@ class _SummaryValue extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Column(
-      crossAxisAlignment: alignEnd
-          ? CrossAxisAlignment.end
-          : CrossAxisAlignment.start,
+      crossAxisAlignment:
+          alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+          style: textTheme.bodySmall?.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           MoneyFormatter.format(value),
-          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          style: textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
