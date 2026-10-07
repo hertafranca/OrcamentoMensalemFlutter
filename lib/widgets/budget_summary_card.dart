@@ -21,7 +21,8 @@ class BudgetSummaryCard extends StatelessWidget {
     final balance = budget - spent;
     final isOverBudget = hasBudget && balance < 0;
     final ratio = hasBudget ? spent / budget : 0.0;
-    final percent = (ratio * 100).round();
+    //ignore: unused_local_variable
+    //final percent = (ratio * 100).round();
 
     final String label;
     final double mainValue;
@@ -67,14 +68,9 @@ class BudgetSummaryCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColors.bottleGreen,
-            AppColors.imperialPurple,
-          ],
+          colors: [AppColors.bottleGreen, AppColors.imperialPurple],
         ),
-        border: Border.all(
-          color: AppColors.richGold.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: AppColors.richGold.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.35),
@@ -121,10 +117,7 @@ class BudgetSummaryCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _SummaryValue(
-                  label: 'Expense',
-                  value: spent,
-                ),
+                child: _SummaryValue(label: 'Expense', value: spent),
               ),
               Expanded(
                 child: _SummaryValue(
@@ -137,28 +130,16 @@ class BudgetSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                Icon(
-                  statusIcon,
-                  color: statusColor,
-                  size: 20,
-                ),
+                Icon(statusIcon, color: statusColor, size: 20),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    statusText,
-                    style: textTheme.bodyMedium,
-                  ),
-                ),
+                Expanded(child: Text(statusText, style: textTheme.bodyMedium)),
               ],
             ),
           ),
@@ -184,21 +165,18 @@ class _SummaryValue extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Column(
-      crossAxisAlignment:
-          alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: alignEnd
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: textTheme.bodySmall?.copyWith(
-            color: AppColors.textSecondary,
-          ),
+          style: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
         ),
         const SizedBox(height: 2),
         Text(
           MoneyFormatter.format(value),
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
